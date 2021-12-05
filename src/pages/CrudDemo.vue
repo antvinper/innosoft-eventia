@@ -1,6 +1,6 @@
 <template>
 	<div class="grid crud-demo">
-		<!-- {{peticionesPublicacion}} -->
+
 		<div class="col-12">
 			<div class="card">
 				<Toast/>
@@ -35,19 +35,37 @@
 					<Column field="idEvento" header="ID del evento" :sortable="true">
 						<template #body="slotProps">
 							<span class="p-column-title">ID del evento</span>
-							{{slotProps.data.id}}
+							{{slotProps.data.idEvento}}
 						</template>
 					</Column>
 					<Column field="titulo" header="Título" :sortable="true">
 						<template #body="slotProps">
 							<span class="p-column-title">Título</span>
-							{{slotProps.data.name.text}}
+							{{slotProps.data.titulo}}
 						</template>
 					</Column>
-					<Column header="Imagen">
+					<Column field="descripcion" header="Descripción" :sortable="true">
+						<template #body="slotProps">
+							<span class="p-column-title">Descripción</span>
+							{{slotProps.data.descripcion}}
+						</template>
+					</Column>
+					<Column field="inicio" header="Inicio" :sortable="true">
+						<template #body="slotProps">
+							<span class="p-column-title">Descripción</span>
+							{{new Date(slotProps.data.inicio).toLocaleString()}}
+						</template>
+					</Column>
+					<Column field="fin" header="Fin" :sortable="true">
+						<template #body="slotProps">
+							<span class="p-column-title">Descripción</span>
+							{{new Date(slotProps.data.fin).toLocaleString()}}
+						</template>
+					</Column>
+					<Column field="imagen" header="Imagen">
 						<template #body="slotProps">
 							<span class="p-column-title">Imagen</span>
-							<img v-if="slotProps.data.logo" :src="slotProps.data.logo.original.url" class="shadow-2" width="100" />
+							<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
 						</template>
 					</Column>
 					<Column field="estado" header="Estado" :sortable="true">
@@ -160,7 +178,6 @@
 
 <script>
 import {FilterMatchMode} from 'primevue/api';
-import ServicioPeticionPublicaciones from '../service/ServicioPeticionPublicaciones';
 
 export default {
 	data() {
@@ -182,11 +199,18 @@ export default {
 	},
 	servicioPeticionPublicaciones: null,
 	created() {
-		this.servicioPeticionPublicaciones = new ServicioPeticionPublicaciones();
 		this.initFilters();
 	},
 	mounted() {
-		this.servicioPeticionPublicaciones.getEventos().then(data => this.peticionesPublicacion = data);
+		this.axios.get('/peticionesPublicacion')
+		.then((response) => {
+			console.log("hola xd")
+			console.log(response.data)
+			this.peticionesPublicacion = response.data;
+		})
+		.catch((e)=>{
+			console.log('error' + e);
+		})
 	},
 	methods: {
 		formatCurrency(value) {
@@ -265,7 +289,7 @@ export default {
 			this.peticionesPublicacion = this.peticionesPublicacion.filter(val => !this.selectedPeticionesPublicacion.includes(val));
 			this.borrarPeticionesPublicacionDialog = false;
 			this.selectedPeticionesPublicacion = null;
-			this.$toast.add({severity:'success', summary: 'Successful', detail: 'PeticionesPublicacion Borrard', life: 3000});
+			this.$toast.add({severity:'success', summary: 'Successful', detail: 'PeticionesPublicacion Borrar', life: 3000});
 		},
 		initFilters() {
             this.filters = {
