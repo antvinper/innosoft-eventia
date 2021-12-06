@@ -1,17 +1,27 @@
 .DS_Store
 node_modules
 /dist
+/resources
+/components
 
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
 
 # local env files
 .env.local
 .env.*.local
+*.env
 
 # Log files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
 # Editor directories and files
 .idea
@@ -20,4 +30,10 @@ pnpm-debug.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw*
+
+Eventbrite Token.txt
+Facebook Access Token.txt
+peticionesInstagram.txt
+
+.env
