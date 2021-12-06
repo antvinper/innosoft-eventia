@@ -95,16 +95,22 @@ import TriStateCheckbox from 'primevue/tristatecheckbox';
 
 import CodeHighlight from './AppCodeHighlight';
 
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+
 router.beforeEach(function(to, from, next) {
     window.scrollTo(0, 0);
     next();
 });
+
+axios.defaults.baseURL = 'http://localhost:3000/api/v1/';
 
 const app = createApp(App);
 
 app.config.globalProperties.$appState = reactive({ theme: 'lara-light-indigo', darkTheme: false });
 
 app.use(PrimeVue, { ripple: true, inputStyle: 'outlined' });
+app.use(VueAxios, axios)
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);
