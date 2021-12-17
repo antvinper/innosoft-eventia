@@ -18,7 +18,7 @@
 					</template>
 				</Toolbar>
 
-				<DataTable ref="dt" :value="peticionesPublicacion" v-model:selection="selectedPeticionesPublicacion" dataKey="id" :paginator="true" :rows="10" :filters="filters"
+				<DataTable ref="dt" :value="peticionesPublicacion" v-model:selection="selectedPeticionesPublicacion" dataKey="idEvento" :paginator="true" :rows="10" :filters="filters"
 							paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
 							currentPageReportTemplate="Mostrando de {first} a {last} de un total de {totalRecords} peticiones" responsiveLayout="scroll">
 					<template #header>
@@ -52,13 +52,13 @@
 					</Column>
 					<Column field="inicio" header="Inicio" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Inicio</span>
 							{{new Date(slotProps.data.inicio).toLocaleString()}}
 						</template>
 					</Column>
 					<Column field="fin" header="Fin" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Fin</span>
 							{{new Date(slotProps.data.fin).toLocaleString()}}
 						</template>
 					</Column>
@@ -80,7 +80,8 @@
 							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
 							
 							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="publicarEnTwitter()" />
-							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
+							<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded mr-2 publicado p-disabled' : 'p-button-rounded mr-2'"
+							@click="confirmarPublicacionFacebook(slotProps.data)"/>
 							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
 							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
 						</template>
@@ -175,6 +176,23 @@
 						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarSelectedPeticionesPublicacion" />
 					</template>
 				</Dialog>
+
+				<Dialog v-model:visible="confirmarPublicacionFB" :style="{width: '450px'}" header="Detalles de la publicación" :modal="true" class="p-fluid">
+					<div class="field">
+						<label for="fbText">La publicación será la siguiente:</label>
+						<Textarea id="fbText" v-model="fbText" required="true" autofocus :class="{'p-invalid': submitted && !fbText}" rows="10"/>
+						<small class="p-invalid" v-if="submitted && !fbText">Este campo es obligatorio.</small>
+					</div>
+					<div class="field">
+						<label for="imagen">Imagen</label>
+						<InputText id="imagen" v-model="imagenFB" required="false" rows="3" cols="20" />
+					</div>
+					
+					<template #footer>
+						<Button label="No" icon="pi pi-times" class="p-button-text" @click="confirmarPublicacionFB = false"/>
+						<Button label="Publicar" icon="pi pi-check" class="p-button-text" @click="publicarEnFacebook" />
+					</template>
+				</Dialog>
 			</div>
 		</div>
 	</div>
@@ -183,6 +201,8 @@
 
 <script>
 import {FilterMatchMode} from 'primevue/api';
+import facebookAPI from '../service/FacebookApi';
+import axios from 'axios';
 
 export default {
 	data() {
@@ -195,6 +215,10 @@ export default {
 			selectedPeticionesPublicacion: null,
 			filters: {},
 			submitted: false,
+			confirmarPublicacionFB: false,
+			responseFB: null,
+			fbText: null,
+			imagenFB: null,
 			estados: [
 				{label: 'PUBLICADO', value: 'publicado'},
 				{label: 'PENDIENTE', value: 'pendiente'},
@@ -325,7 +349,48 @@ export default {
         },
 		toggleMenu(event) {
 			this.$refs.menu.toggle(event);
+		},
+		confirmarPublicacionFacebook(product){
+			this.product = product
+			this.imagenFB = product.imagenFB;
+			var fechaInicio = new Date(product.inicio).toLocaleDateString();
+			var horaInicio = new Date(product.inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+			this.fbText = "El evento " + product.titulo + ", se celebrará el " + fechaInicio + " a las " + horaInicio + ".\n" + product.descripcion + ".";
+			this.confirmarPublicacionFB = true;
+		},
+		publicarEnFacebook(){
+			var request = this.fbText;
+			console.log("imagen:", this.imagenFB);
+			var imagen = this.imagenFB;
+			
+			if(imagen){
+				this.responseFB = facebookAPI.fbPostPhotoOnPage(request, imagen);
+				this.establecerPublicado(this.product);
+			}else{
+				this.responseFB = facebookAPI.fbPostOnPage(request);	
+				this.establecerPublicado(this.product);
+			}
+			
+		},
+		establecerPublicado(request){
+			if(this.responseFB == '200' || this.responseFB){
+				const paramsData = {};
+				paramsData['publicadoFacebook'] = true;
+				axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+					.then(response => {
+						console.log(response.data);
+						console.log("request: ", request);
+						this.peticionesPublicacion.find(p => p._id === request._id).publicadoFacebook = true;
+					}).catch(error =>{
+						console.log(error);
+					});
+				this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado en Facebook', life: 3000});
+				this.confirmarPublicacionFB = false;
+			}else{
+				this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Facebook', life: 3000});
+			}
 		}
+
 	}
 }
 </script>
@@ -353,5 +418,9 @@ export default {
 			background: #FFCDD2;
 			color: #C63737;
 		}
+	}
+	.publicado{
+		background-color: #22C55E;
+		border-color: #22C55E;
 	}
 </style>
