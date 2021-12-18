@@ -1,7 +1,8 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 var PeticionPublicacion = require("./src/models/peticionPublicacion");
 
-const DB_URL = "mongodb+srv://admin:admin@innosofteventia.a1j4z.mongodb.net/innosoftEventia?retryWrites=true&w=majority"
+const DB_URL = process.env.MONGO_URL
 
 const dbConnect = function () {
   const db = mongoose.connection;
