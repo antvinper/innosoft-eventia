@@ -231,7 +231,6 @@ export default {
 	mounted() {
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
-			console.log("hola xd")
 			console.log(response.data)
 			this.peticionesPublicacion = response.data;
 		})
