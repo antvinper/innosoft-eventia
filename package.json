@@ -26,19 +26,26 @@
 	},
 	"dependencies": {
 		"axios": "0.19.0",
+		"btoa": "^1.2.1",
 		"chart.js": "3.3.2",
 		"cookie-parser": "^1.4.6",
 		"core-js": "3.6.5",
 		"cors": "^2.8.5",
 		"dotenv": "^10.0.0",
 		"express": "^4.17.1",
+		"find-config": "^1.0.0",
+		"fs": "0.0.1-security",
 		"mongoose": "^6.0.14",
 		"primeflex": "3.0.0",
 		"primeicons": "5.0.0",
 		"primevue": "3.9.1",
 		"prismjs": "1.9.0",
+		"request": "^2.88.2",
+		"twit": "^2.2.11",
+		"twitter": "^1.7.1",
 		"vue": "3.2.9",
 		"vue-axios": "^3.4.0",
+		"vue-command": "^23.0.1",
 		"vue-router": "^4.0.0-0"
 	}
 }
