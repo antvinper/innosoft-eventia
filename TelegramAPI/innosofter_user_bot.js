@@ -3,8 +3,8 @@ function lauchTelegramUserBot() {
 
     telegramUserBotCommands = require("./commands/innosofter_user_bot.js")
 
-    const { TOKEN } = process.env
-    const bot = new Telegraf(TOKEN)
+    const { TELEGRAM_TOKEN } = process.env
+    const bot = new Telegraf(TELEGRAM_TOKEN)
 
     bot.start(telegramUserBotCommands.startCommand)
     bot.help(telegramUserBotCommands.helpCommand)
@@ -16,5 +16,5 @@ function lauchTelegramUserBot() {
     return bot
 }
 
-require("dotenv").config()
+require("dotenv").config({path: "../.env"})
 lauchTelegramUserBot()

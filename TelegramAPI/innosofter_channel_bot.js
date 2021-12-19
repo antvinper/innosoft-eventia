@@ -1,8 +1,8 @@
 function launchTelegramChannelBot (){
   const TelegramBot = require('telegraf/telegram')
 
-  const {TOKEN} = process.env
-  const InnoSofterBot = new TelegramBot(TOKEN, { polling: true })
+  const {TELEGRAM_TOKEN} = process.env
+  const InnoSofterBot = new TelegramBot(TELEGRAM_TOKEN, { polling: true })
 
   return InnoSofterBot;
 }
@@ -25,14 +25,14 @@ function listAllEvents (InnoSofterBot, chatid, eventsList){
   InnoSofterBot.sendMessage(chatid,eventsString)  
 }
 
-require("dotenv").config()
+require("dotenv").config({path: "../.env"})
 const InnoSofterBot = launchTelegramChannelBot()
 const {CHATID} = process.env
 
 let event = {eventName: "Los viernes de la jungla.", eventDate: "10/12/2021", eventDuration: "2 días"}
-//sendEvent(InnoSofterBot, event, CHATID)
+sendEvent(InnoSofterBot, event, CHATID)
 let eventPoll = {question: "¿Qué te esta pareciendo el evento?", options: ["Estupendo","Maravilloso","Fantástico"]}
-//sendEventPoll(InnoSofterBot, CHATID, eventPoll)
+sendEventPoll(InnoSofterBot, CHATID, eventPoll)
 var eventsList = ["Comida con los abuelos", "Comida con mis padres", "Comida con la novia"]
-//listAllEvents(InnoSofterBot, CHATID, eventsList)
+listAllEvents(InnoSofterBot, CHATID, eventsList)
 
