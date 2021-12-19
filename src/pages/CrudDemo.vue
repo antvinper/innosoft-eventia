@@ -74,10 +74,15 @@
 							<span :class="'product-badge estado-' + (slotProps.data.estado ? slotProps.data.estado.toLowerCase() : '')">{{slotProps.data.estado}}</span>
 						</template>
 					</Column>
-					<Column>
+					<Column field="actions" header="Actions">
 						<template #body="slotProps">
 							<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
-							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="confirmBorrarProduct(slotProps.data)" />
+							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
+							
+							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="publicarEnTwitter()" />
+							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
+							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
+							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
 						</template>
 					</Column>
 				</DataTable>
@@ -194,7 +199,29 @@ export default {
 				{label: 'PUBLICADO', value: 'publicado'},
 				{label: 'PENDIENTE', value: 'pendiente'},
 				{label: 'DENEGADO', value: 'denegado'}
-			]
+			],
+			overlayMenuItems: [
+					{
+						label: 'Publicar en Twitter',
+						icon: 'pi pi-twitter',
+                        command: () => {this.publicarEnTwitter()}
+					},
+					{
+						label: 'Publicar en Facebook',
+						icon: 'pi pi-facebook',
+                        command: () => {this.publicarEnFacebook()}
+					},
+					{
+						label: 'Publicar en Telegram',
+						icon: 'pi pi-telegram',
+                        command: () => {this.publicarEnTelegram()}
+					},
+					{
+						label: 'Publicar en Gmail',
+						icon: 'pi pi-at',
+                        command: () => {this.publicarEnGmail()}
+					},
+				]
 		}
 	},
 	servicioPeticionPublicaciones: null,
@@ -204,7 +231,6 @@ export default {
 	mounted() {
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
-			console.log("hola xd")
 			console.log(response.data)
 			this.peticionesPublicacion = response.data;
 		})
@@ -295,7 +321,10 @@ export default {
             this.filters = {
                 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
             }
-        }
+        },
+		toggleMenu(event) {
+			this.$refs.menu.toggle(event);
+		}
 	}
 }
 </script>
