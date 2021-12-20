@@ -273,8 +273,9 @@ export default {
 		publicarEnTwitter(request){
 			if(request.imagen){
 				let cuerpoDelTweet = request.titulo + " " + (new Date(request.inicio).toLocaleString()) + " " + request.imagen;
+				console.log("Tweet con foto");
 				let command = {};
-				command["command"] = `node publicarTweetConImagen.js ${cuerpoDelTweet}`;
+				command["command"] = `node ./src/twitter-api/publicarTweetConImagen.js ${cuerpoDelTweet}`;
 				this.axios.post('/tweet', command)
 				.then((response) => {
 					console.log(response.data);
