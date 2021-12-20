@@ -37,3 +37,6 @@ Facebook Access Token.txt
 peticionesInstagram.txt
 
 .env
+
+# Imagen de referencia para API Twitter
+/src/assets/imagenTwitter.jpg

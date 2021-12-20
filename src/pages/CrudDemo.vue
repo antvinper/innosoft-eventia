@@ -79,7 +79,31 @@
 							<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
 							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
 							
-							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="publicarEnTwitter()" />
+							<!-- Twitter -->
+							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="openDisplayTwitter" />
+							<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" :style="{width: '350px'}" :modal="true">
+								<Panel header="Título" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
+								</Panel>
+								<Panel header="Fecha inicio" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
+								</Panel>
+								<Panel header="Fecha fin" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
+								</Panel>
+								<Panel header="Descripción" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.descripcion}}</p>
+								</Panel>
+								<Panel header="Imagen" :toggleable="true">
+									<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
+									<p v-else class="line-height-3 m-0">Sin imagen</p>
+								</Panel>
+								<template #footer>
+									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
+									<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(slotProps.data)" class="p-button-text" />
+								</template>
+							</Dialog>
+
 							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
 							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
 							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
@@ -187,6 +211,7 @@ import {FilterMatchMode} from 'primevue/api';
 export default {
 	data() {
 		return {
+			displayTwitter: false,
 			peticionesPublicacion: null,
 			peticionesPublicacionDialog: false,
 			borrarProductDialog: false,
@@ -239,6 +264,43 @@ export default {
 		})
 	},
 	methods: {
+		openDisplayTwitter() {
+			this.displayTwitter = true;
+		},
+		closeDisplayTwitter() {
+			this.displayTwitter = false;
+		},
+		publicarEnTwitter(request){
+			if(request.imagen){
+				let cuerpoDelTweet = request.titulo + " " + (new Date(request.inicio).toLocaleString()) + " " + request.imagen;
+				console.log("Tweet con foto");
+				let command = {};
+				command["command"] = `node ./src/twitter-api/publicarTweetConImagen.js ${cuerpoDelTweet}`;
+				this.axios.post('/tweet', command)
+				.then((response) => {
+					console.log(response.data);
+					this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+				})
+				.catch((e)=>{
+					console.log('error' + e);
+				})
+			}
+			else{
+				let cuerpoDelTweet = request.titulo + " " + (new Date(request.inicio).toLocaleString());
+				console.log("Tweet sin foto");
+				let command = {};
+				command["command"] = `node ./src/twitter-api/publicarTweetSinImagen.js ${cuerpoDelTweet}`;
+				this.axios.post('/tweet', command)
+				.then((response) => {
+					console.log(response.data);
+					this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+				})
+				.catch((e)=>{
+					console.log('error' + e);
+				})
+			}
+			this.closeDisplayTwitter();
+		},
 		formatCurrency(value) {
 			if(value)
 				return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
