@@ -11,13 +11,12 @@
 							<Button label="Borrar" icon="pi pi-trash" class="p-button-danger" @click="confirmBorrarSelected" :disabled="!selectedPeticionesPublicacion || !selectedPeticionesPublicacion.length" />
 						</div>
 					</template>
-
 					<template v-slot:end>
 						<FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
 						<Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"  />
 					</template>
 				</Toolbar>
-
+				
 				<DataTable ref="dt" :value="peticionesPublicacion" v-model:selection="selectedPeticionesPublicacion" dataKey="id" :paginator="true" :rows="10" :filters="filters"
 							paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
 							currentPageReportTemplate="Mostrando de {first} a {last} de un total de {totalRecords} peticiones" responsiveLayout="scroll">
@@ -106,7 +105,7 @@
 
 							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
 							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
-							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
+							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail(slotProps.data)" />
 						</template>
 					</Column>
 				</DataTable>
@@ -207,6 +206,10 @@
 
 <script>
 import {FilterMatchMode} from 'primevue/api';
+import { obtenerAuthURL } from "../service/gmailService.js";
+import { enviarEmail } from "../service/gmailService.js";
+import { obtenerToken } from "../service/gmailService.js";
+
 
 export default {
 	data() {
@@ -225,6 +228,8 @@ export default {
 				{label: 'PENDIENTE', value: 'pendiente'},
 				{label: 'DENEGADO', value: 'denegado'}
 			],
+			codigoGmail:'',
+			tokenMail:'',
 			overlayMenuItems: [
 					{
 						label: 'Publicar en Twitter',
@@ -254,6 +259,33 @@ export default {
 		this.initFilters();
 	},
 	mounted() {
+		if(window.location.search.startsWith('?code=')){
+			
+			let urlParams = new URLSearchParams(window.location.search);
+			this.codigoGmail= urlParams.get('code');
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				console.log("eventos guardados", response.data.filter(p=>p.publicadoGmail===true))
+				var evento=response.data.filter(p=>p.publicadoGmail===true)[0];
+				
+				obtenerToken(this.codigoGmail).then((response) => {
+					this.tokenMail = JSON.stringify(response.tokens);
+					enviarEmail(this.tokenMail,evento)
+					//aqui hay que hacer un post para volver a poner el publicado a false
+					const paramsFalse = {};
+					paramsFalse['publicadoGmail'] = false;
+					this.axios.put(`/peticionesPublicacion/${evento._id}`, paramsFalse)
+					//location.href=window.location.protocol+'//'+window.location.host;
+				}).catch((e)=>{
+					console.log('error' + e);
+				})
+			}).catch(error =>{
+				console.log(error);
+			});
+			/* 
+			 */
+		}
+
+
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
 			console.log(response.data)
@@ -301,6 +333,19 @@ export default {
 			}
 			this.closeDisplayTwitter();
 		},
+		//poner de parametro product
+		publicarEnGmail(product){		
+			const paramsData = {};
+			paramsData['publicadoGmail'] = true;
+			this.axios.put(`/peticionesPublicacion/${product._id}`, paramsData)
+			
+			var authUrl= obtenerAuthURL();			
+			location.href=authUrl;  
+
+			//hacer lo del token mail
+		
+		},
+
 		formatCurrency(value) {
 			if(value)
 				return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
