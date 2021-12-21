@@ -1,6 +1,7 @@
 const axios = require('axios');
 const express = require('express');
 const router = express.Router();
+const mongoose = require("mongoose");
 
 const PeticionPublicacion = require('../models/peticionPublicacion');
 
@@ -32,7 +33,8 @@ const _id = req.params.id;
 router.post('/', async(req, res) => {
     const body = req.body;  
     try {
-    console.log("Posting a new peticionPublicacion")
+    console.log("Creando una nueva peticionPublicacion")
+    body._id = new mongoose.Types.ObjectId()
     const peticionPublicacionDB = await PeticionPublicacion.create(body);
     res.status(200).json(peticionPublicacionDB); 
     } catch (error) {
@@ -47,12 +49,23 @@ router.put('/:id', async(req, res) => {
     const _id = req.params.id;
     const body = req.body;  
     try {
-        console.log("Updating a peticionPublicacion")
-        console.log("PeticionPublicacion ID: ", _id)
-        console.log("Body: ", req.body)
+        console.log("Actualizando una peticionPublicacion")
 
         const peticionPublicacionDB = await PeticionPublicacion.findByIdAndUpdate(_id, body);
 
+        res.status(200).json(peticionPublicacionDB);
+    } catch (error) {
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
+    }
+});
+
+router.delete('/:id', async(req, res) => {
+    const _id = req.params.id;
+    try {
+        const peticionPublicacionDB = await PeticionPublicacion.findByIdAndDelete(_id);
         res.status(200).json(peticionPublicacionDB);
     } catch (error) {
         return res.status(500).json({
