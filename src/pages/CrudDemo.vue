@@ -1,37 +1,44 @@
 <template>
 	<div class="grid crud-demo">
 
+		<div style="width: 100%; display: flex; justify-content: center;">
+			<div class="card" style="">
+				<h1 style="font-size: 5rem">Innosoft Eventia</h1>
+			</div>
+		</div>
+
 		<div class="col-12">
 			<div class="card">
 				<Toast/>
 				<Toolbar class="mb-4">
 					<template v-slot:start>
 						<div class="my-2">
-							<Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+							<Button label="Crear" icon="pi pi-plus" class="p-button-success mr-2" @click="crearPeticionPublicacion" />
 							<Button label="Borrar" icon="pi pi-trash" class="p-button-danger" @click="confirmBorrarSelected" :disabled="!selectedPeticionesPublicacion || !selectedPeticionesPublicacion.length" />
 						</div>
 					</template>
 
 					<template v-slot:end>
-						<FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
-						<Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"  />
+						<Button label="Actualizar base de datos" icon="pi pi-plus" class="mr-2 inline-block" @click="actualizarBD"/>
+						<Button label="Exportar CSV" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"  />
 					</template>
 				</Toolbar>
 
-				<DataTable ref="dt" :value="peticionesPublicacion" v-model:selection="selectedPeticionesPublicacion" dataKey="id" :paginator="true" :rows="10" :filters="filters"
-							paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-							currentPageReportTemplate="Mostrando de {first} a {last} de un total de {totalRecords} peticiones" responsiveLayout="scroll">
+				<DataTable ref="dt" :value="peticionesPublicacion" v-model:selection="selectedPeticionesPublicacion" dataKey="_id" 
+				:paginator="true" :rows="10" :filters="filters" :rowsPerPageOptions="[5,10,25]" responsiveLayout="scroll"
+				paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+				currentPageReportTemplate="Mostrando de {first} a {last} de un total de {totalRecords} peticiones">
 					<template #header>
 						<div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
 							<h5 class="m-0">Peticiones de publicación de eventos</h5>
 							<span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                <InputText v-model="filters['global'].value" placeholder="Buscar..." />
                             </span>
 						</div>
 					</template>
 
-					<Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+					<Column selectionMode="multiple" headerStyle="width: 3rem" />
 					<Column field="idEvento" header="ID del evento" :sortable="true">
 						<template #body="slotProps">
 							<span class="p-column-title">ID del evento</span>
@@ -68,135 +75,101 @@
 							<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
 						</template>
 					</Column>
-					<Column field="estado" header="Estado" :sortable="true">
+					<Column field="actions" header="Acciones">
 						<template #body="slotProps">
-							<span class="p-column-title">Estado de publicación</span>
-							<span :class="'product-badge estado-' + (slotProps.data.estado ? slotProps.data.estado.toLowerCase() : '')">{{slotProps.data.estado}}</span>
-						</template>
-					</Column>
-					<Column field="actions" header="Actions">
-						<template #body="slotProps">
-							<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
-							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
-							
-							<!-- Twitter -->
-							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="openDisplayTwitter" />
-							<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" :style="{width: '350px'}" :modal="true">
-								<Panel header="Título" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
-								</Panel>
-								<Panel header="Fecha inicio" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
-								</Panel>
-								<Panel header="Fecha fin" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
-								</Panel>
-								<Panel header="Descripción" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.descripcion}}</p>
-								</Panel>
-								<Panel header="Imagen" :toggleable="true">
-									<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
-									<p v-else class="line-height-3 m-0">Sin imagen</p>
-								</Panel>
-								<template #footer>
-									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
-									<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(slotProps.data)" class="p-button-text" />
-								</template>
-							</Dialog>
-
-							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
-							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
-							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
+							<div style="display: flex">
+								<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
+								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
+								<Button icon="pi pi-twitter" class="p-button-rounded p-button-warning mr-2" @click="openDisplayTwitter(slotProps.data)" />
+							</div>
+							<div>
+								<Button icon="pi pi-facebook" class="p-button-rounded p-button-warning mr-2" @click="publicarEnFacebook()" />
+								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="publicarEnTelegram()" />
+								<Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail()" />
+							</div>
 						</template>
 					</Column>
 				</DataTable>
 
-				<Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Product Details" :modal="true" class="p-fluid">
-					<img :src="'imagenes/product/' + product.imagen" :alt="product.imagen" v-if="product.imagen" width="150" class="mt-0 mx-auto mb-5 block shadow-2" />
+				<Dialog v-model:visible="peticionPublicacionDialog" header="Peticion de publicacion" :modal="true" class="p-fluid col-3">
 					<div class="field">
 						<label for="titulo">Título</label>
-						<InputText id="titulo" v-model.trim="product.titulo" required="true" autofocus :class="{'p-invalid': submitted && !product.titulo}" />
-						<small class="p-invalid" v-if="submitted && !product.titulo">El título es obligatorio.</small>
+						<InputText id="titulo" v-model.trim="peticionPublicacion.titulo" required="true" autofocus :class="{'p-invalid': submitted && !peticionPublicacion.titulo}" />
+						<small class="p-invalid" v-if="submitted && !peticionPublicacion.titulo">El título es obligatorio.</small>
 					</div>
 					<div class="field">
-						<label for="description">Description</label>
-						<Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
-					</div>
-
-					<div class="field">
-						<label for="estado" class="mb-3">Estado de publicación</label>
-						<Dropdown id="estado" v-model="product.estado" :options="estados" optionLabel="label" placeholder="Selecciona un estado">
-							<template #value="slotProps">
-								<div v-if="slotProps.value && slotProps.value.value">
-									<span :class="'product-badge estado-' +slotProps.value.value">{{slotProps.value.label}}</span>
-								</div>
-								<div v-else-if="slotProps.value && !slotProps.value.value">
-									<span :class="'product-badge estado-' +slotProps.value.toLowerCase()">{{slotProps.value}}</span>
-								</div>
-								<span v-else>
-									{{slotProps.placeholder}}
-								</span>
-							</template>
-						</Dropdown>
-					</div>
-
-					<div class="field">
-						<label class="mb-3">Category</label>
-						<div class="formgrid grid">
-							<div class="field-radiobutton col-6">
-								<RadioButton id="category1" name="category" value="Accessories" v-model="product.category" />
-								<label for="category1">Accessories</label>
-							</div>
-							<div class="field-radiobutton col-6">
-								<RadioButton id="category2" name="category" value="Clothing" v-model="product.category" />
-								<label for="category2">Clothing</label>
-							</div>
-							<div class="field-radiobutton col-6">
-								<RadioButton id="category3" name="category" value="Electronics" v-model="product.category" />
-								<label for="category3">Electronics</label>
-							</div>
-							<div class="field-radiobutton col-6">
-								<RadioButton id="category4" name="category" value="Fitness" v-model="product.category" />
-								<label for="category4">Fitness</label>
-							</div>
-						</div>
+						<label for="descripcion">Descripcion</label>
+						<Textarea id="descripcion" v-model="peticionPublicacion.descripcion" required="true" rows="3" cols="20" />
 					</div>
 
 					<div class="formgrid grid">
 						<div class="field col">
-							<label for="price">Price</label>
-							<InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" />
+							<label for="fechaInicio">Fecha inicio</label>
+							<Calendar id="fechaInicio" v-model="peticionPublicacion.inicio" :showTime="true" :showSeconds="true" :showIcon="true" required="true" autofocus :class="{'p-invalid': submitted && !peticionPublicacion.inicio}" />
+							<small class="p-invalid" v-if="submitted && !peticionPublicacion.inicio">La fecha de inicio es obligatoria.</small>
 						</div>
 						<div class="field col">
-							<label for="quantity">Quantity</label>
-							<InputNumber id="quantity" v-model="product.quantity" integeronly />
+							<label for="fechaFin">Fecha fin</label>
+							<Calendar id="fechaFin" v-model="peticionPublicacion.fin" :showTime="true" :showSeconds="true" :showIcon="true" required="true" autofocus :class="{'p-invalid': submitted && !peticionPublicacion.fin}" />
+							<small class="p-invalid" v-if="submitted && !peticionPublicacion.fin">La fecha de fin es obligatoria.</small>
 						</div>
 					</div>
-					<template #footer>
-						<Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
-						<Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveProduct" />
-					</template>
-				</Dialog>
-
-				<Dialog v-model:visible="borrarProductDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
-					<div class="flex align-items-center justify-content-center">
-						<i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-						<span v-if="product">¿Seguro que quieres borrar el evento: "<b>{{product.titulo}}</b>"?</span>
+					<div class="field">
+						<label for="imagen">URL de la imagen</label>
+						<InputText id="imagen" v-model.trim="peticionPublicacion.imagen"/>
+						<img :src="peticionPublicacion.imagen" :alt="peticionPublicacion.imagen" v-if="peticionPublicacion.imagen" 
+						width="250" class="mt-5 mx-auto mb-2 block shadow-2" />
 					</div>
 					<template #footer>
-						<Button label="No" icon="pi pi-times" class="p-button-text" @click="borrarProductDialog = false"/>
-						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarProduct" />
+						<Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
+						<Button label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarPeticionPublicacion" />
 					</template>
 				</Dialog>
 
-				<Dialog v-model:visible="borrarPeticionesPublicacionDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+				<Dialog v-model:visible="borrarPeticionPublicacionDialog" class="col-3" header="Confirmar" :modal="true">
 					<div class="flex align-items-center justify-content-center">
 						<i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-						<span v-if="product">¿Seguro que deseas borrar esta petición de publicacion?</span>
+						<span v-if="peticionPublicacion">¿Estás seguro de que deseas borrar el evento: "<b>{{peticionPublicacion.titulo}}</b>"?</span>
+					</div>
+					<template #footer>
+						<Button label="No" icon="pi pi-times" class="p-button-text" @click="borrarPeticionPublicacionDialog = false"/>
+						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarPeticionPublicacion" />
+					</template>
+				</Dialog>
+
+				<Dialog v-model:visible="borrarPeticionesPublicacionDialog" :style="{width: '450px'}" header="Confirmar" :modal="true">
+					<div class="flex align-items-center justify-content-center">
+						<i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+						<span v-if="peticionPublicacion">¿Estás seguro de que deseas borrar las peticiones de publicación seleccionadas?</span>
 					</div>
 					<template #footer>
 						<Button label="No" icon="pi pi-times" class="p-button-text" @click="borrarPeticionesPublicacionDialog = false"/>
 						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarSelectedPeticionesPublicacion" />
+					</template>
+				</Dialog>
+
+				<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" class="col-3" :modal="true">
+					<div class="p-fluid formgrid grid" style="text-align: center; justify-content: center">
+						<Panel header="Título" class="mb-3 col-12 md:col-12">
+							<p class="line-height-3 m-0">{{peticionParaPublicarConTwitter.titulo}}</p>
+						</Panel>
+						<Panel header="Fecha inicio" class="mb-3 col-12 md:col-6">
+							<p class="line-height-3 m-0">{{new Date(peticionParaPublicarConTwitter.inicio).toLocaleString()}}</p>
+						</Panel>
+						<Panel header="Fecha fin" class="mb-3 col-12 md:col-6">
+							<p class="line-height-3 m-0">{{new Date(peticionParaPublicarConTwitter.fin).toLocaleString()}}</p>
+						</Panel>
+						<Panel header="Descripción" class="mb-3 col-12 md:col-12">
+							<p class="line-height-3 m-0">{{peticionParaPublicarConTwitter.descripcion}}</p>
+						</Panel>
+						<Panel header="Imagen" class="col-12 md:col-12">
+							<img v-if="peticionParaPublicarConTwitter.imagen" :src="peticionParaPublicarConTwitter.imagen" class="shadow-2" width="100" />
+							<p v-else class="line-height-3 m-0">Sin imagen</p>
+						</Panel>
+					</div>
+					<template #footer>
+						<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
+						<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(peticionParaPublicarConTwitter)" class="p-button-text" />
 					</template>
 				</Dialog>
 			</div>
@@ -213,18 +186,17 @@ export default {
 		return {
 			displayTwitter: false,
 			peticionesPublicacion: null,
-			peticionesPublicacionDialog: false,
-			borrarProductDialog: false,
+			peticionPublicacionDialog: false,
+			borrarPeticionPublicacionDialog: false,
 			borrarPeticionesPublicacionDialog: false,
-			product: {},
+			peticionPublicacion: {
+				inicio: null,
+				fin: null,
+			},
+			peticionParaPublicarConTwitter: {},
 			selectedPeticionesPublicacion: null,
 			filters: {},
 			submitted: false,
-			estados: [
-				{label: 'PUBLICADO', value: 'publicado'},
-				{label: 'PENDIENTE', value: 'pendiente'},
-				{label: 'DENEGADO', value: 'denegado'}
-			],
 			overlayMenuItems: [
 					{
 						label: 'Publicar en Twitter',
@@ -256,7 +228,6 @@ export default {
 	mounted() {
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
-			console.log(response.data)
 			this.peticionesPublicacion = response.data;
 		})
 		.catch((e)=>{
@@ -264,10 +235,28 @@ export default {
 		})
 	},
 	methods: {
-		openDisplayTwitter() {
+		actualizarBD() {
+			this.axios.put('/actualizarBD')
+			.then((response) => {
+				console.log(response.data)
+				if (response.data.length > 0) {
+					for (let nuevoEvento of response.data)
+						this.peticionesPublicacion.push(nuevoEvento);
+					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Base de datos actualizada (' + response.data.length + ' elementos nuevos)', life: 3000});
+				} else {
+					this.$toast.add({severity:'warn', summary: 'Sin cambios', detail: 'No hay eventos nuevos', life: 3000});
+				}
+			})
+			.catch((e)=>{
+				console.log('error' + e);
+			})
+		},
+		openDisplayTwitter(peticion) {
+			this.peticionParaPublicarConTwitter = peticion
 			this.displayTwitter = true;
 		},
 		closeDisplayTwitter() {
+			this.peticionParaPublicarConTwitter = {}
 			this.displayTwitter = false;
 		},
 		publicarEnTwitter(request){
@@ -279,7 +268,7 @@ export default {
 				this.axios.post('/tweet', command)
 				.then((response) => {
 					console.log(response.data);
-					this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
 				})
 				.catch((e)=>{
 					console.log('error' + e);
@@ -293,7 +282,7 @@ export default {
 				this.axios.post('/tweet', command)
 				.then((response) => {
 					console.log(response.data);
-					this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
 				})
 				.catch((e)=>{
 					console.log('error' + e);
@@ -301,53 +290,66 @@ export default {
 			}
 			this.closeDisplayTwitter();
 		},
-		formatCurrency(value) {
-			if(value)
-				return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-			return;
-		},
-		openNew() {
-			this.product = {};
-			this.submitted = false;
-			this.productDialog = true;
+		crearPeticionPublicacion() {
+			window.open("https://www.eventbrite.com/manage/events/create")
 		},
 		hideDialog() {
-			this.productDialog = false;
+			this.peticionPublicacionDialog = false;
 			this.submitted = false;
 		},
-		saveProduct() {
+		actualizarPeticionPublicacion() {
 			this.submitted = true;
-			if (this.product.titulo.trim()) {
-			if (this.product.id) {
-				this.product.estado = this.product.estado.value ? this.product.estado.value: this.product.estado;
-				this.peticionesPublicacion[this.findIndexById(this.product.id)] = this.product;
-				this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
+			if (this.peticionPublicacion.titulo.trim()) {
+				if (this.peticionPublicacion._id) {
+					this.axios.put('/peticionesPublicacion/' + this.peticionPublicacion._id, this.peticionPublicacion)
+					.then(() => {
+						this.peticionesPublicacion[this.findIndexById(this.peticionPublicacion._id)] = this.peticionPublicacion;
+
+						this.axios.get('/peticionesPublicacion')
+						.then((response) => {
+							this.peticionesPublicacion = response.data;
+						})
+						.catch((e)=>{
+							console.log('error' + e);
+						})
+
+						this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticion de publicacion actualizada', life: 3000});
+					})
+					.catch((e)=>{
+						console.log('error' + e);
+					})
 				}
-				else {
-					this.product.id = this.createId();
-					this.product.eventId = this.createId();
-					this.product.imagen = 'product-placeholder.svg';
-					this.product.estado = this.product.estado ? this.product.estado.value : 'INSTOCK';
-					this.peticionesPublicacion.push(this.product);
-					this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Created', life: 3000});
-				}
-				this.productDialog = false;
-				this.product = {};
+				this.peticionPublicacionDialog = false;
+				this.peticionPublicacion = {};
 			}
 		},
-		editProduct(product) {
-			this.product = {...product};
-			this.productDialog = true;
+		editarPeticionPublicacion(peticionPublicacion) {
+			this.peticionPublicacion = {...peticionPublicacion};
+			this.peticionPublicacionDialog = true;
 		},
-		confirmBorrarProduct(product) {
-			this.product = product;
-			this.borrarProductDialog = true;
+		confirmarBorrarPeticionPublicacion(peticionPublicacion) {
+			this.peticionPublicacion = peticionPublicacion;
+			this.borrarPeticionPublicacionDialog = true;
 		},
-		borrarProduct() {
-			this.peticionesPublicacion = this.peticionesPublicacion.filter(val => val.id !== this.product.id);
-			this.borrarProductDialog = false;
-			this.product = {};
-			this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Borrard', life: 3000});
+		borrarPeticionPublicacion() {
+			this.axios.delete('/peticionesPublicacion/' + this.peticionPublicacion._id)
+			.then(() => {
+				this.axios.get('/peticionesPublicacion')
+				.then((response) => {
+					this.peticionesPublicacion = response.data;
+				})
+				.catch((e)=>{
+					console.log('error' + e);
+				})
+
+				this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticion de publicacion eliminada', life: 3000});
+			})
+			.catch((e)=>{
+				console.log('error' + e);
+			})
+
+			this.borrarPeticionPublicacionDialog = false;
+			this.peticionPublicacion = {};
 		},
 		findIndexById(id) {
 			let index = -1;
@@ -374,45 +376,68 @@ export default {
 			this.borrarPeticionesPublicacionDialog = true;
 		},
 		borrarSelectedPeticionesPublicacion() {
-			this.peticionesPublicacion = this.peticionesPublicacion.filter(val => !this.selectedPeticionesPublicacion.includes(val));
+			let promesas = []
 			this.borrarPeticionesPublicacionDialog = false;
-			this.selectedPeticionesPublicacion = null;
-			this.$toast.add({severity:'success', summary: 'Successful', detail: 'PeticionesPublicacion Borrar', life: 3000});
+
+			for (let peticion of this.selectedPeticionesPublicacion) {
+				promesas.push(this.axios.delete('/peticionesPublicacion/' + peticion._id)
+				.catch((e)=>{
+					console.log('error' + e);
+				}))
+			}
+
+			Promise.all(promesas)
+			.then(() => {
+				this.selectedPeticionesPublicacion = null;
+
+				this.axios.get('/peticionesPublicacion')
+				.then((response) => {
+					this.peticionesPublicacion = response.data;
+					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticiones de publicacion eliminadas', life: 3000});
+				})
+				.catch((e)=>{
+					console.log('error' + e);
+				})
+			})
+
+			
 		},
 		initFilters() {
             this.filters = {
                 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
             }
         },
-		toggleMenu(event) {
-			this.$refs.menu.toggle(event);
-		}
 	}
 }
 </script>
 
-<style scoped lang="scss">
-	.product-badge {
-		border-radius: 2px;
-		padding: .25em .5rem;
-		text-transform: uppercase;
-		font-weight: 700;
-		font-size: 12px;
-		letter-spacing: .3px;
+<style lang="scss">
 
-		&.estado-publicado {
-			background: #C8E6C9;
-			color: #256029;
-		}
+.peticionPublicacion-badge {
+	border-radius: 2px;
+	padding: .25em .5rem;
+	text-transform: uppercase;
+	font-weight: 700;
+	font-size: 12px;
+	letter-spacing: .3px;
 
-		&.estado-pendiente {
-			background: #FEEDAF;
-			color: #8A5340;
-		}
-
-		&.estado-denegado {
-			background: #FFCDD2;
-			color: #C63737;
-		}
+	&.estado-publicado {
+		background: #C8E6C9;
+		color: #256029;
 	}
+
+	&.estado-pendiente {
+		background: #FEEDAF;
+		color: #8A5340;
+	}
+
+	&.estado-denegado {
+		background: #FFCDD2;
+		color: #C63737;
+	}
+}
+
+.p-panel .p-panel-header {
+	place-content: center;
+}
 </style>

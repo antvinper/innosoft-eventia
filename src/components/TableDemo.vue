@@ -272,7 +272,6 @@
 
 <script>
 	import {FilterMatchMode,FilterOperator} from 'primevue/api';
-	import CustomerService from "../service/CustomerService";
 	import ServicioPeticionPublicaciones from '../service/ServicioPeticionPublicaciones';
 	export default {
 		data() {
@@ -304,22 +303,13 @@
 				],
 			}
 		},
-		customerService: null,
 		servicioPeticionPublicaciones: null,
 		created() {
-			this.customerService = new CustomerService();
 			this.servicioPeticionPublicaciones = new ServicioPeticionPublicaciones();
 			this.initFilters1();
 		},
 		mounted() {
 			this.servicioPeticionPublicaciones.getProductsWithOrdersSmall().then(data => this.products = data);
-			this.customerService.getCustomersLarge().then(data => {
-				this.customer1 = data; 
-				this.loading1 = false;
-				this.customer1.forEach(customer => customer.date = new Date(customer.date));
-			});
-			this.customerService.getCustomersLarge().then(data => this.customer2 = data);
-			this.customerService.getCustomersMedium().then(data => this.customer3 = data);
 			this.loading2 = false;
 		},
 		methods: {
