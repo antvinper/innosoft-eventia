@@ -47,7 +47,7 @@ describe('Publicar en Facebook CON imagen: ', () => {
         .end(function(error,response) {
           
           idPublish2 = response.text.match('\\d+_\\d+')[0]
-          console.log('Respuesta: ', response)
+          console.log('Respuesta: ', idPublish2)
           console.log('Estado: ', response.status)
 
           if(error){
