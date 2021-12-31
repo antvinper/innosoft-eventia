@@ -1,5 +1,6 @@
 const dbConnect = require("./db");
 const app = require("./server.js");
+const tele_bot = require("./bot_launch/innosofter_user_bot")
 
 const PORT = process.env.PORT || 3000;
 
@@ -13,3 +14,5 @@ dbConnect().then(
     console.log("Connection error: " + err);
   }
 );
+
+tele_bot.lauchTelegramUserBot();
