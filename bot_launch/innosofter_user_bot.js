@@ -14,10 +14,17 @@ function lauchTelegramUserBot() {
     bot.start(telegramUserBotCommands.startCommand)
     bot.help(telegramUserBotCommands.helpCommand)
     bot.command("about", telegramUserBotCommands.aboutCommand)
-    bot.on("sticker", (ctx) => ctx.reply("(╬ ಠ益ಠ)"))
-    bot.action("help", telegramUserBotCommands.startCommand)
+    bot.command("getEvents", telegramUserBotCommands.getEventsCommand)
+    bot.command("commands", telegramUserBotCommands.commandsCommand)
+    bot.action("help", telegramUserBotCommands.helpCommand)
+    bot.action("start", telegramUserBotCommands.startCommand)
+    bot.action("getEvents", telegramUserBotCommands.getEventsCommand)
+    bot.action("about", telegramUserBotCommands.aboutCommand)
+    bot.action("disturb", (ctx) => ctx.reply("(╬ ಠ益ಠ)"))
 
     bot.launch()
+
+    return true
 }
 
 module.exports = {lauchTelegramUserBot}
