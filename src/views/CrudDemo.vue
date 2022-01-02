@@ -2,8 +2,11 @@
 	<div class="grid crud-demo">
 
 		<div style="width: 100%; display: flex; justify-content: center;">
-			<div class="card" style="">
-				<h1 style="font-size: 5rem">Innosoft Eventia</h1>
+			<div class="card col-6" style="display: flex; justify-content: space-evenly">
+				<img v-if="LogoEventia" :src="LogoEventia" width="100"/>
+				<h1 style="font-size: 4rem">
+					Innosoft Eventia
+				</h1>
 			</div>
 		</div>
 
@@ -17,7 +20,6 @@
 							<Button label="Borrar" icon="pi pi-trash" class="p-button-danger" @click="confirmBorrarSelected" :disabled="!selectedPeticionesPublicacion || !selectedPeticionesPublicacion.length" />
 						</div>
 					</template>
-
 					<template v-slot:end>
 						<Button label="Actualizar base de datos" icon="pi pi-plus" class="mr-2 inline-block" @click="actualizarBD"/>
 						<Button label="Exportar CSV" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"  />
@@ -59,13 +61,13 @@
 					</Column>
 					<Column field="inicio" header="Inicio" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Inicio</span>
 							{{new Date(slotProps.data.inicio).toLocaleString()}}
 						</template>
 					</Column>
 					<Column field="fin" header="Fin" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Fin</span>
 							{{new Date(slotProps.data.fin).toLocaleString()}}
 						</template>
 					</Column>
@@ -78,14 +80,15 @@
 					<Column field="actions" header="Acciones">
 						<template #body="slotProps">
 							<div style="display: flex">
-								<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
+								<Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-twitter" class="p-button-rounded p-button-warning mr-2" @click="openDisplayTwitter(slotProps.data)" />
 							</div>
 							<div>
-								<Button icon="pi pi-facebook" class="p-button-rounded p-button-warning mr-2" @click="publicarEnFacebook()" />
-								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="publicarEnTelegram()" />
-								<Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail()" />
+								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded p-button-success mr-2 p-disabled' 
+								: 'p-button-rounded p-button-warning mr-2'" @click="confirmarPublicacionFacebook(slotProps.data)"/>
+								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="openDisplayTelegram(slotProps.data)" />
+                                <Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail(slotProps.data)" />
 							</div>
 						</template>
 					</Column>
@@ -121,7 +124,7 @@
 						width="250" class="mt-5 mx-auto mb-2 block shadow-2" />
 					</div>
 					<template #footer>
-						<Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="hideDialog"/>
+						<Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-danger" @click="hideDialog"/>
 						<Button label="Actualizar" icon="pi pi-check" class="p-button-text" @click="actualizarPeticionPublicacion" />
 					</template>
 				</Dialog>
@@ -133,7 +136,7 @@
 					</div>
 					<template #footer>
 						<Button label="No" icon="pi pi-times" class="p-button-text" @click="borrarPeticionPublicacionDialog = false"/>
-						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarPeticionPublicacion" />
+						<Button label="Sí" icon="pi pi-check" class="p-button-text" @click="borrarPeticionPublicacion" />
 					</template>
 				</Dialog>
 
@@ -144,10 +147,32 @@
 					</div>
 					<template #footer>
 						<Button label="No" icon="pi pi-times" class="p-button-text" @click="borrarPeticionesPublicacionDialog = false"/>
-						<Button label="Yes" icon="pi pi-check" class="p-button-text" @click="borrarSelectedPeticionesPublicacion" />
+						<Button label="Sí" icon="pi pi-check" class="p-button-text" @click="borrarSelectedPeticionesPublicacion" />
 					</template>
 				</Dialog>
 
+				<Dialog v-model:visible="confirmarPublicacionFB" class="p-fluid col-3" header="Detalles de la publicación" :modal="true">
+					<div class="p-fluid formgrid grid" style="justify-content: center">
+						<div class="field mb-3 col-12 md:col-12">
+							<label for="fbText">Cuerpo de la publicación</label>
+							<Textarea id="fbText" v-model="fbText" required="true" :class="{'p-invalid': submitted && !fbText}" rows="10"/>
+							<small class="p-invalid" v-if="submitted && !fbText">Este campo es obligatorio.</small>
+						</div>
+						<div class="field mb-3 col-12 md:col-12">
+							<label for="imagen">Imagen</label>
+							<InputText id="imagen" v-model="peticionParaPublicarConFacebook.imagen" required="false" rows="3" cols="20" />
+						</div>
+						<div class="field mb-3 col-12 md:col-12 text-center">
+							<img v-if="peticionParaPublicarConFacebook.imagen" :src="peticionParaPublicarConFacebook.imagen" class="shadow-2" width="250" />
+							<p v-else class="line-height-3 m-0">Sin imagen</p>
+						</div>
+					</div>	
+					<template #footer>
+						<Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-danger" @click="cancelarPublicarFacebook"/>
+						<Button label="Publicar" icon="pi pi-check" class="p-button-text" @click="publicarEnFacebook" autofocus />
+					</template>
+				</Dialog>
+        
 				<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" class="col-3" :modal="true">
 					<div class="p-fluid formgrid grid" style="text-align: center; justify-content: center">
 						<Panel header="Título" class="mb-3 col-12 md:col-12">
@@ -168,8 +193,29 @@
 						</Panel>
 					</div>
 					<template #footer>
-						<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
-						<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(peticionParaPublicarConTwitter)" class="p-button-text" />
+						<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text p-button-danger"/>
+						<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(peticionParaPublicarConTwitter)" class="p-button-text" autofocus/>
+					</template>
+				</Dialog>
+
+				<Dialog header="Anunciar en Telegram" v-model:visible="displayTelegram" class="col-3" :modal="true">
+					<div class="p-fluid formgrid grid" style="text-align: center; justify-content: center">
+						<Panel header="ID del evento" class="mb-3 col-12 md:col-12">
+							<p class="line-height-3 m-0">{{peticionParaPublicarConTelegram.idEvento}}</p>
+						</Panel>
+						<Panel header="Título" class="mb-3 col-12 md:col-12">
+							<p class="line-height-3 m-0">{{peticionParaPublicarConTelegram.titulo}}</p>
+						</Panel>
+						<Panel header="Fecha inicio" class="mb-3 col-12 md:col-6">
+							<p class="line-height-3 m-0">{{new Date(peticionParaPublicarConTelegram.inicio).toLocaleString()}}</p>
+						</Panel>
+						<Panel header="Fecha fin" class="mb-3 col-12 md:col-6">
+							<p class="line-height-3 m-0">{{new Date(peticionParaPublicarConTelegram.fin).toLocaleString()}}</p>
+						</Panel>
+					</div>
+					<template #footer>
+						<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTelegram" class="p-button-text p-button-danger"/>
+						<Button label="Anunciar" icon="pi pi-check" @click="publicarEnTelegram(peticionParaPublicarConTelegram)" class="p-button-text" autofocus />
 					</template>
 				</Dialog>
 			</div>
@@ -180,11 +226,21 @@
 
 <script>
 import {FilterMatchMode} from 'primevue/api';
+import facebookAPI from '../service/FacebookApi';
+import axios from 'axios';
+import { obtenerAuthURL } from "../service/gmailService.js";
+import { enviarEmail } from "../service/gmailService.js";
+import { obtenerToken } from "../service/gmailService.js";
+import { hacerSwal} from "../service/SwalService.js";
+import { mails} from "../service/SwalService.js";
+import LogoEventia from "@/assets/LogoEventia.png"
 
 export default {
 	data() {
 		return {
+			LogoEventia: LogoEventia,
 			displayTwitter: false,
+			displayTelegram: false,
 			peticionesPublicacion: null,
 			peticionPublicacionDialog: false,
 			borrarPeticionPublicacionDialog: false,
@@ -193,7 +249,25 @@ export default {
 				inicio: null,
 				fin: null,
 			},
+			peticionParaPublicarConFacebook: {},
 			peticionParaPublicarConTwitter: {},
+			peticionParaPublicarConTelegram: {},
+			selectedPeticionesPublicacion: null,
+			filters: {},
+			submitted: false,
+			codigoGmail:'',
+			tokenMail:'',
+			confirmarPublicacionFB: false,
+			responseFB: null,
+			fbText: null,
+			imagenFB: null,
+licacion: {
+				inicio: null,
+				fin: null,
+			},
+			peticionParaPublicarConFacebook: {},
+			peticionParaPublicarConTwitter: {},
+			peticionParaPublicarConTelegram: {},
 			selectedPeticionesPublicacion: null,
 			filters: {},
 			submitted: false,
@@ -226,6 +300,33 @@ export default {
 		this.initFilters();
 	},
 	mounted() {
+		if(window.location.search.startsWith('?code=')){
+			
+			let urlParams = new URLSearchParams(window.location.search);
+			this.codigoGmail= urlParams.get('code');
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				
+				var evento=response.data.filter(p=>p.botonGmail===true)[0];
+				console.log("el evento es",evento)
+				obtenerToken(this.codigoGmail).then((response) => {
+					this.tokenMail = JSON.stringify(response.tokens);
+					console.log("llega aqui",mails)
+					hacerSwal(()=>{
+						
+						enviarEmail(this.tokenMail,mails,evento)})
+					
+					const paramsFalse = {};
+					paramsFalse['botonGmail'] = false;
+					this.axios.put(`/peticionesPublicacion/${evento._id}`, paramsFalse)
+				}).catch((e)=>{
+					console.error('error' + e);
+				})
+			}).catch(error =>{
+				console.error(error);
+			});
+		}
+
+
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
 			this.peticionesPublicacion = response.data;
@@ -290,9 +391,50 @@ export default {
 			}
 			this.closeDisplayTwitter();
 		},
+		openDisplayTelegram(peticion) {
+			this.peticionParaPublicarConTelegram = peticion
+			this.displayTelegram = true;
+		},
+		closeDisplayTelegram() {
+			this.peticionParaPublicarConTelegram = {}
+			this.displayTelegram = false;
+		},
+		publicarEnTelegram(request){
+			let cuerpoDelMensaje = request.idEvento + " " + (new Date(request.inicio).toLocaleString()) + " " + (new Date(request.fin).toLocaleString()) + " " + request.titulo;
+			let command = {};
+			command["command"] = `node ./src/service/TelegramChannelBotService.js ${cuerpoDelMensaje}`;
+			this.axios.post('/telegram', command)
+			.then((response) => {
+				console.log(response.data);
+				this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento anunciado con éxito en Telegram', life: 3000});
+			})
+			.catch((e)=>{
+				console.log('error' + e);
+			})
+			this.closeDisplayTelegram();
+		},
 		crearPeticionPublicacion() {
 			window.open("https://www.eventbrite.com/manage/events/create")
 		},
+		publicarEnGmail(product){
+			
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				let promises=[]
+				let eventoBueno=response.data.filter(p=>p.botonGmail===true && p._id===product._id).length
+				if(eventoBueno===0){
+					promises.push(this.axios.put('/peticionesPublicacion/'+product._id, {botonGmail:true}))
+				}
+				let events=response.data.filter(p=>p.botonGmail===true && p._id!=product._id)
+				for(let i=0;i<events.lenght;i++){
+					promises.push(this.axios.put('/peticionesPublicacion/'+events[i]._id, {botonGmail:false}))
+				}
+				Promise.all(promises).then(()=>{
+					var authUrl= obtenerAuthURL();	
+					console.log(authUrl)		
+					location.href=authUrl;  
+				})
+			})	
+		}, 
 		hideDialog() {
 			this.peticionPublicacionDialog = false;
 			this.submitted = false;
@@ -361,14 +503,6 @@ export default {
 			}
 			return index;
 		},
-		createId() {
-			let id = '';
-			var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-			for ( var i = 0; i < 5; i++ ) {
-				id += chars.charAt(Math.floor(Math.random() * chars.length));
-			}
-			return id;
-		},
 		exportCSV() {
 			this.$refs.dt.exportCSV();
 		},
@@ -399,43 +533,60 @@ export default {
 					console.log('error' + e);
 				})
 			})
-
-			
 		},
 		initFilters() {
             this.filters = {
                 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
             }
         },
+		toggleMenu(event) {
+			this.$refs.menu.toggle(event);
+		},
+		confirmarPublicacionFacebook(peticionPublicacion){
+			this.peticionParaPublicarConFacebook = peticionPublicacion
+			var fechaInicio = new Date(peticionPublicacion.inicio).toLocaleDateString();
+			var horaInicio = new Date(peticionPublicacion.inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+			this.fbText = "El evento " + peticionPublicacion.titulo + ", se celebrará el " + fechaInicio + " a las " + horaInicio + (peticionPublicacion.descripcion ?  ".\n" + peticionPublicacion.descripcion + "." : ".");
+			this.confirmarPublicacionFB = true;
+		},
+		publicarEnFacebook(){
+			var request = this.fbText;
+			var imagen = this.peticionParaPublicarConFacebook.imagen;
+			
+			if(imagen){
+				this.responseFB = facebookAPI.fbPostPhotoOnPage(request, imagen);
+				this.establecerPublicado(this.peticionParaPublicarConFacebook);
+			}else{
+				this.responseFB = facebookAPI.fbPostOnPage(request);	
+				this.establecerPublicado(this.peticionParaPublicarConFacebook);
+			}
+		},
+		establecerPublicado(request){
+			if(this.responseFB == '200' || this.responseFB) {
+				const paramsData = {};
+				paramsData['publicadoFacebook'] = true;
+				axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+					.then(() => {
+						this.peticionesPublicacion.find(p => p._id === request._id).publicadoFacebook = true;
+						this.peticionParaPublicarConFacebook = {}
+					}).catch(error =>{
+						console.log(error);
+					});
+				this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado en Facebook', life: 3000});
+				this.confirmarPublicacionFB = false;
+			} else {
+				this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Facebook', life: 3000});
+			}
+		},
+		cancelarPublicarFacebook() {
+			this.confirmarPublicacionFB = false
+			this.peticionParaPublicarConFacebook = {}
+		}
 	}
 }
 </script>
 
 <style lang="scss">
-
-.peticionPublicacion-badge {
-	border-radius: 2px;
-	padding: .25em .5rem;
-	text-transform: uppercase;
-	font-weight: 700;
-	font-size: 12px;
-	letter-spacing: .3px;
-
-	&.estado-publicado {
-		background: #C8E6C9;
-		color: #256029;
-	}
-
-	&.estado-pendiente {
-		background: #FEEDAF;
-		color: #8A5340;
-	}
-
-	&.estado-denegado {
-		background: #FFCDD2;
-		color: #C63737;
-	}
-}
 
 .p-panel .p-panel-header {
 	place-content: center;
