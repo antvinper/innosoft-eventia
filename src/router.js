@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import Crud from './pages/CrudDemo.vue';
+import Crud from './views/CrudDemo.vue';
 
 const routes = [
     {
