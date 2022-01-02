@@ -380,6 +380,7 @@ export default {
 		},
 		crearPeticionPublicacion() {
 			window.open("https://www.eventbrite.com/manage/events/create")
+		},
 		publicarEnGmail(product){
 			
 			this.axios.get('/peticionesPublicacion').then(response=>{
