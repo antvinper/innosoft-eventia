@@ -28,7 +28,7 @@ router.put('/', async(req, res) => {
                     descripcion: evento.description.text,
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
-                    estado: null,
+                    botonGmail: false,
                     publicadoFacebook: false
                 }
                 añadirBD.push(peticionPublicacion)

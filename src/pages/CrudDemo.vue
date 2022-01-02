@@ -17,7 +17,6 @@
 							<Button label="Borrar" icon="pi pi-trash" class="p-button-danger" @click="confirmBorrarSelected" :disabled="!selectedPeticionesPublicacion || !selectedPeticionesPublicacion.length" />
 						</div>
 					</template>
-
 					<template v-slot:end>
 						<Button label="Actualizar base de datos" icon="pi pi-plus" class="mr-2 inline-block" @click="actualizarBD"/>
 						<Button label="Exportar CSV" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"  />
@@ -133,7 +132,7 @@
 							<div>
 								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded mr-2 publicado p-disabled' : 'p-button-rounded mr-2'" @click="confirmarPublicacionFacebook(slotProps.data)"/>
 								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="publicarEnTelegram()" />
-								<Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail()" />
+                                <Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail(slotProps.data)" />
 							</div>
 						</template>
 					</Column>
@@ -247,7 +246,14 @@
 import {FilterMatchMode} from 'primevue/api';
 import facebookAPI from '../service/FacebookApi';
 import axios from 'axios';
+import { obtenerAuthURL } from "../service/gmailService.js";
+import { enviarEmail } from "../service/gmailService.js";
+import { obtenerToken } from "../service/gmailService.js";
+import { hacerSwal} from "../service/SwalService.js";
+import { mails} from "../service/SwalService.js";
 
+
+//const Swal = require('sweetalert2')
 export default {
 	data() {
 		return {
@@ -265,6 +271,8 @@ export default {
 			selectedPeticionesPublicacion: null,
 			filters: {},
 			submitted: false,
+			codigoGmail:'',
+			tokenMail:'',
 			confirmarPublicacionFB: false,
 			responseFB: null,
 			fbText: null,
@@ -298,6 +306,35 @@ export default {
 		this.initFilters();
 	},
 	mounted() {
+		if(window.location.search.startsWith('?code=')){
+			
+			let urlParams = new URLSearchParams(window.location.search);
+			this.codigoGmail= urlParams.get('code');
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				
+				var evento=response.data.filter(p=>p.botonGmail===true)[0];
+				console.log("el evento es",evento)
+				obtenerToken(this.codigoGmail).then((response) => {
+					this.tokenMail = JSON.stringify(response.tokens);
+					console.log("llega aqui",mails)
+					hacerSwal(()=>{
+						
+						enviarEmail(this.tokenMail,mails,evento)})
+					
+					const paramsFalse = {};
+					paramsFalse['botonGmail'] = false;
+					this.axios.put(`/peticionesPublicacion/${evento._id}`, paramsFalse)
+					//.then(location.href=window.location.protocol+'//'+window.location.host)
+					
+				}).catch((e)=>{
+					console.error('error' + e);
+				})
+			}).catch(error =>{
+				console.error(error);
+			});
+		}
+
+
 		this.axios.get('/peticionesPublicacion')
 		.then((response) => {
 			this.peticionesPublicacion = response.data;
@@ -384,6 +421,32 @@ export default {
 		},
 		crearPeticionPublicacion() {
 			window.open("https://www.eventbrite.com/manage/events/create")
+		},
+		publicarEnGmail(product){
+			
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				let promises=[]
+				let eventoBueno=response.data.filter(p=>p.botonGmail===true && p._id===product._id).length
+				if(eventoBueno===0){
+					promises.push(this.axios.put('/peticionesPublicacion/'+product._id, {botonGmail:true}))
+				}
+				let events=response.data.filter(p=>p.botonGmail===true && p._id!=product._id)
+				for(let i=0;i<events.lenght;i++){
+					promises.push(this.axios.put('/peticionesPublicacion/'+events[i]._id, {botonGmail:false}))
+				}
+				Promise.all(promises).then(()=>{
+					var authUrl= obtenerAuthURL();	
+					console.log(authUrl)		
+					location.href=authUrl;  
+				})
+			})	
+		}, 
+		
+
+		formatCurrency(value) {
+			if(value)
+				return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+			return;
 		},
 		hideDialog() {
 			this.peticionPublicacionDialog = false;
