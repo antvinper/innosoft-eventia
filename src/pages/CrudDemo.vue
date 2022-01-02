@@ -111,8 +111,7 @@
 								<Button icon="pi pi-twitter" class="p-button-rounded p-button-warning mr-2" @click="openDisplayTwitter(slotProps.data)" />
 							</div>
 							<div>
-								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded mr-2 publicado p-disabled' : 'p-button-rounded mr-2'"
-							  	@click="confirmarPublicacionFacebook(slotProps.data)"/>
+								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded mr-2 publicado p-disabled' : 'p-button-rounded mr-2'" @click="confirmarPublicacionFacebook(slotProps.data)"/>
 								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="publicarEnTelegram()" />
 								<Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail()" />
 							</div>
