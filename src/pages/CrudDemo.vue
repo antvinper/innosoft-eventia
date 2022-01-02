@@ -209,8 +209,12 @@ import {FilterMatchMode} from 'primevue/api';
 import { obtenerAuthURL } from "../service/gmailService.js";
 import { enviarEmail } from "../service/gmailService.js";
 import { obtenerToken } from "../service/gmailService.js";
+import { hacerSwal} from "../service/SwalService.js";
+import { mails} from "../service/SwalService.js";
+//import {fireTercerInput} from "../service/SwalService";
 
 
+//const Swal = require('sweetalert2')
 export default {
 	data() {
 		return {
@@ -264,22 +268,26 @@ export default {
 			let urlParams = new URLSearchParams(window.location.search);
 			this.codigoGmail= urlParams.get('code');
 			this.axios.get('/peticionesPublicacion').then(response=>{
-				console.log("eventos guardados", response.data.filter(p=>p.publicadoGmail===true))
-				var evento=response.data.filter(p=>p.publicadoGmail===true)[0];
 				
+				var evento=response.data.filter(p=>p.botonGmail===true)[0];
+				console.log("el evento es",evento)
 				obtenerToken(this.codigoGmail).then((response) => {
 					this.tokenMail = JSON.stringify(response.tokens);
-					enviarEmail(this.tokenMail,evento)
-					//aqui hay que hacer un post para volver a poner el publicado a false
+					console.log("llega aqui",mails)
+					hacerSwal(()=>{
+						
+						enviarEmail(this.tokenMail,mails,evento)})
+					
 					const paramsFalse = {};
-					paramsFalse['publicadoGmail'] = false;
+					paramsFalse['botonGmail'] = false;
 					this.axios.put(`/peticionesPublicacion/${evento._id}`, paramsFalse)
-					//location.href=window.location.protocol+'//'+window.location.host;
+					//.then(location.href=window.location.protocol+'//'+window.location.host)
+					
 				}).catch((e)=>{
-					console.log('error' + e);
+					console.error('error' + e);
 				})
 			}).catch(error =>{
-				console.log(error);
+				console.error(error);
 			});
 			/* 
 			 */
@@ -334,17 +342,26 @@ export default {
 			this.closeDisplayTwitter();
 		},
 		//poner de parametro product
-		publicarEnGmail(product){		
-			const paramsData = {};
-			paramsData['publicadoGmail'] = true;
-			this.axios.put(`/peticionesPublicacion/${product._id}`, paramsData)
+		publicarEnGmail(product){
 			
-			var authUrl= obtenerAuthURL();			
-			location.href=authUrl;  
-
-			//hacer lo del token mail
+			this.axios.get('/peticionesPublicacion').then(response=>{
+				let promises=[]
+				let eventoBueno=response.data.filter(p=>p.botonGmail===true && p._id===product._id).length
+				if(eventoBueno===0){
+					promises.push(this.axios.put('/peticionesPublicacion/'+product._id, {botonGmail:true}))
+				}
+				let events=response.data.filter(p=>p.botonGmail===true && p._id!=product._id)
+				for(let i=0;i<events.lenght;i++){
+					promises.push(this.axios.put('/peticionesPublicacion/'+events[i]._id, {botonGmail:false}))
+				}
+				Promise.all(promises).then(()=>{
+					var authUrl= obtenerAuthURL();	
+					console.log(authUrl)		
+					location.href=authUrl;  
+				})
+			})	
+		}, 
 		
-		},
 
 		formatCurrency(value) {
 			if(value)

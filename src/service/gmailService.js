@@ -1,5 +1,6 @@
 const {google} = require('googleapis');
 
+
 require("dotenv").config();
 
 
@@ -11,7 +12,8 @@ const SCOPES=[
     'https://mail.google.com/',
     'https://www.googleapis.com/auth/gmail.modify',
     'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.send'
+    'https://www.googleapis.com/auth/gmail.send',
+    'https://mail.google.com/'
 ];
 
 const oAuth2Client = new google.auth.OAuth2(
@@ -45,9 +47,11 @@ function makeBody(to, from, subject, message) {
       return encodedMail;
 }
 
-function sendMessage(evento) {
+function sendMessage(str,evento) {
+    console.log(str)
+    console.log("true o false", str==='innosoft.eventia@gmail.com' , 'innosoft.eventia@gmail.com', str)
     var message='El evento '+evento.titulo+ ' va a empezar el día y hora '+ evento.inicio+' y a va acabar el día '+ evento.fin;
-    var raw = makeBody('innosoft.eventia@gmail.com', 'innosoft.eventia@gmail.com', evento.titulo, message);
+    var raw = makeBody(str, 'innosoft.eventia@gmail.com', evento.titulo, message);
     const gmail = google.gmail({version: 'v1', oAuth2Client});
      gmail.users.messages.send({
         auth: oAuth2Client,
@@ -59,8 +63,9 @@ function sendMessage(evento) {
          return(err || response)
      });
 }
-export function enviarEmail(tokenMail,evento) {
-    console.log("evento,",evento)
+export function enviarEmail(tokenMail,mails,evento) {
+    console.log("los emails que llegan son",mails)
     oAuth2Client.setCredentials(JSON.parse(tokenMail));
-    sendMessage(evento)
+    sendMessage(mails,evento)
   }
+

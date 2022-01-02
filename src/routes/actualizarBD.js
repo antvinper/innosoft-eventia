@@ -29,7 +29,7 @@ router.get('/', async(req, res) => {
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
                     estado: null,
-                    publicadoGmail: false
+                    botonGmail: false
                 }
                 añadirBD.push(peticionPublicacion)
             }

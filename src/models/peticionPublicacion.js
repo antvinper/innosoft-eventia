@@ -19,6 +19,7 @@ const peticionPublicacionSchema = mongoose.Schema({
         default: null,
         enum: estadosValidos,
     },
+    botonGmail:Boolean
 });
 
 const PeticionPublicacion = mongoose.model('PeticionPublicacion', peticionPublicacionSchema);
