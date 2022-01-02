@@ -1,9 +1,11 @@
 const axios = require('axios');
 const moment = require('moment');
+const dotenv = require("dotenv");
+dotenv.config({ path: require('find-config')('.env') });
 
 module.exports = (ctx) => {
-
-    axios.get("http://localhost:3000/api/v1/peticionesPublicacion/")
+    let backendUrl = process.env.BACKEND_URL || "http://localhost:3000/api/v1"
+    axios.get(backendUrl + "/peticionesPublicacion")
         .then(response => {
             let events = ""
             const lenEvents = events.length
