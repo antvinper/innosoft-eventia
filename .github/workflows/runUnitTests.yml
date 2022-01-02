@@ -23,6 +23,9 @@ jobs:
         CHATID: ${{ secrets.CHATID }}
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
         TELEGRAM_USERBOT: ${{ secrets.TELEGRAM_USERBOT }}
+        VUE_APP_FB_API_PAGE_TOKEN: ${{ secrets.VUE_APP_FB_API_PAGE_TOKEN }}
+        VUE_APP_FB_GRAPH_VERSION: ${{ secrets.VUE_APP_FB_GRAPH_VERSION }}
+        VUE_APP_FB_PAGE_ID: ${{ secrets.VUE_APP_FB_PAGE_ID }}
       run: |
           touch .env
           echo MONGO_URL="$MONGO_URL" >> .env
@@ -35,6 +38,9 @@ jobs:
           echo CHATID="$CHATID" >> .env
           echo TELEGRAM_TOKEN="$TELEGRAM_TOKEN" >> .env
           echo TELEGRAM_USERBOT="$TELEGRAM_USERBOT" >> .env          
+          echo VUE_APP_FB_API_PAGE_TOKEN="$VUE_APP_FB_API_PAGE_TOKEN" >> .env
+          echo VUE_APP_FB_GRAPH_VERSION="$VUE_APP_FB_GRAPH_VERSION" >> .env
+          echo VUE_APP_FB_PAGE_ID="$VUE_APP_FB_PAGE_ID" >> .env
           npm ci
           npm run ci
       shell: bash
