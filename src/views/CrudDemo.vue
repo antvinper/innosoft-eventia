@@ -79,54 +79,6 @@
 					</Column>
 					<Column field="actions" header="Acciones">
 						<template #body="slotProps">
-							<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
-							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
-							
-							<!-- Twitter -->
-							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="openDisplayTwitter" />
-							<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" :style="{width: '350px'}" :modal="true">
-								<Panel header="Título" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
-								</Panel>
-								<Panel header="Fecha inicio" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
-								</Panel>
-								<Panel header="Fecha fin" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
-								</Panel>
-								<Panel header="Descripción" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.descripcion}}</p>
-								</Panel>
-								<Panel header="Imagen" :toggleable="true">
-									<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
-									<p v-else class="line-height-3 m-0">Sin imagen</p>
-								</Panel>
-								<template #footer>
-									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
-									<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(slotProps.data)" class="p-button-text" />
-								</template>
-							</Dialog>
-
-							<!-- Telegram -->
-							<Button icon="pi pi-telegram" class="p-button-rounded mr-2" @click="openDisplayTelegram" />
-							<Dialog header="Anunciar en Telegram" v-model:visible="displayTelegram" :style="{width: '350px'}" :modal="true">
-								<Panel header="ID del evento" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.idEvento}}</p>
-								</Panel>
-								<Panel header="Título" :toggleable="true">
-									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
-								</Panel>
-								<Panel header="Fecha inicio" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
-								</Panel>
-								<Panel header="Fecha fin" :toggleable="true">
-									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
-								</Panel>
-								<template #footer>
-									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTelegram" class="p-button-text" autofocus/>
-									<Button label="Anunciar" icon="pi pi-check" @click="publicarEnTelegram(slotProps.data)" class="p-button-text" />
-								</template>
-							</Dialog>
 							<div style="display: flex">
 								<Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
@@ -310,23 +262,6 @@ export default {
 			confirmarPublicacionFB: false,
 			responseFB: null,
 			fbText: null,
-			imagenFB: null,
-licacion: {
-				inicio: null,
-				fin: null,
-			},
-			peticionParaPublicarConFacebook: {},
-			peticionParaPublicarConTwitter: {},
-			peticionParaPublicarConTelegram: {},
-			selectedPeticionesPublicacion: null,
-			filters: {},
-			submitted: false,
-			codigoGmail:'',
-			tokenMail:'',
-			confirmarPublicacionFB: false,
-			responseFB: null,
-			fbText: null,
-			imagenFB: null,
 			overlayMenuItems: [
 					{
 						label: 'Publicar en Twitter',
