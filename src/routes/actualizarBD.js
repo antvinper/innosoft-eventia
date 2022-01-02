@@ -40,8 +40,6 @@ router.put('/', async(req, res) => {
         .catch((e)=>{
             console.log('error' + e);
         })
-        // const peticionPublicacionDB = await PeticionPublicacion.find();
-        // res.json(peticionPublicacionDB);
     } catch (error) {
         return res.status(400).json({
             mensaje: 'An error has occurred',

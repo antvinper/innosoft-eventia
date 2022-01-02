@@ -20,6 +20,12 @@ jobs:
         TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
         TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        CHATID: ${{ secrets.CHATID }}
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_USERBOT: ${{ secrets.TELEGRAM_USERBOT }}
+        VUE_APP_FB_API_PAGE_TOKEN: ${{ secrets.VUE_APP_FB_API_PAGE_TOKEN }}
+        VUE_APP_FB_GRAPH_VERSION: ${{ secrets.VUE_APP_FB_GRAPH_VERSION }}
+        VUE_APP_FB_PAGE_ID: ${{ secrets.VUE_APP_FB_PAGE_ID }}
       run: |
           touch .env
           echo MONGO_URL="$MONGO_URL" >> .env
@@ -29,6 +35,12 @@ jobs:
           echo TWITTER_API_SECRET="$TWITTER_API_SECRET" >> .env
           echo TWITTER_ACCESS_TOKEN="$TWITTER_ACCESS_TOKEN" >> .env
           echo TWITTER_ACCESS_TOKEN_SECRET="$TWITTER_ACCESS_TOKEN_SECRET" >> .env
+          echo CHATID="$CHATID" >> .env
+          echo TELEGRAM_TOKEN="$TELEGRAM_TOKEN" >> .env
+          echo TELEGRAM_USERBOT="$TELEGRAM_USERBOT" >> .env          
+          echo VUE_APP_FB_API_PAGE_TOKEN="$VUE_APP_FB_API_PAGE_TOKEN" >> .env
+          echo VUE_APP_FB_GRAPH_VERSION="$VUE_APP_FB_GRAPH_VERSION" >> .env
+          echo VUE_APP_FB_PAGE_ID="$VUE_APP_FB_PAGE_ID" >> .env
           npm ci
           npm run ci
       shell: bash

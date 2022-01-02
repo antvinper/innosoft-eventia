@@ -20,5 +20,6 @@ app.get("/", (req, res) => {
 app.use('/api/v1/peticionesPublicacion', require('./src/routes/peticionesPublicacion'));
 app.use('/api/v1/actualizarBD', require('./src/routes/actualizarBD'));
 app.use('/api/v1/tweet', require('./src/routes/twitter'));
+app.use('/api/v1/telegram', require('./src/routes/telegram'));
 
 module.exports = app;
