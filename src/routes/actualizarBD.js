@@ -9,7 +9,7 @@ const PeticionPublicacion = require('../models/peticionPublicacion');
 const ID_ORGANIZACION = process.env.ID_ORGANIZACION
 const TOKEN_APLICACION = process.env.TOKEN_APLICACION
 
-router.get('/', async(req, res) => {
+router.put('/', async(req, res) => {
     try {
         const peticionesPublicacionExistentes = await PeticionPublicacion.find()
 
@@ -29,6 +29,7 @@ router.get('/', async(req, res) => {
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
                     botonGmail: false
+                    publicadoFacebook: false
                 }
                 añadirBD.push(peticionPublicacion)
             }

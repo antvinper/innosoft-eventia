@@ -23,7 +23,6 @@
 </template>
 
 <script>
-	import NodeService from '../service/NodeService'
 
 	export default {
 		data() {
@@ -33,14 +32,6 @@
 				treeTableValue: null,
 				selectedTreeTableValue: null,
 			}
-		},
-		nodeService: null,
-		created() {
-			this.nodeService = new NodeService();
-		},
-		mounted() {
-			this.nodeService.getTreeNodes().then(data => this.treeValue = data);
-			this.nodeService.getTreeTableNodes().then(data => this.treeTableValue = data);
 		},
 	}
 </script>

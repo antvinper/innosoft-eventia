@@ -57,7 +57,6 @@
 </template>
 
 <script>
-import CountryService from '../service/CountryService';
 
 export default {
     data() {
@@ -82,13 +81,6 @@ export default {
             value9: null,
             value10: null
         }
-    },
-    countryService: null,
-    created() {
-        this.countryService = new CountryService();
-    },
-    mounted() {
-        this.countryService.getCountries().then(data => this.countries = data);
     },
     methods: {
         searchCountry(event) {

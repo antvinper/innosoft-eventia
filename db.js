@@ -22,7 +22,6 @@ var pruebaPublicacion = new PeticionPublicacion({
     inicio: new Date("2021-11-24T21:15:13"),
     fin: Date.now(),
     imagen: "https://i.ytimg.com/vi/LlWzJbuYslA/hqdefault.jpg",
-    estado: "Pendiente"
 });
 
 // pruebaPublicacion.save(function(err) {
