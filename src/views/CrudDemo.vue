@@ -244,6 +244,7 @@ export default {
 			displayTwitter: false,
 			displayTelegram: false,
 			peticionesPublicacion: null,
+			peticionPublicacionDraft: null,
 			peticionPublicacionDialog: false,
 			borrarPeticionPublicacionDialog: false,
 			borrarPeticionesPublicacionDialog: false,
@@ -434,6 +435,10 @@ export default {
 			this.submitted = true;
 			if (this.peticionPublicacion.titulo.trim()) {
 				if (this.peticionPublicacion._id) {
+					let original = this.peticionesPublicacion.find(p => p._id === this.peticionPublicacionDraft._id)
+					if (original.titulo !== this.peticionPublicacion.titulo || original.descripcion !== this.peticionPublicacion.descripcion || original.inicio !== this.peticionPublicacion.inicio || original.fin !== this.peticionPublicacion.fin){
+						this.peticionPublicacion.publicadoFacebook = false
+					}
 					this.axios.put('/peticionesPublicacion/' + this.peticionPublicacion._id, this.peticionPublicacion)
 					.then(() => {
 						this.peticionesPublicacion[this.findIndexById(this.peticionPublicacion._id)] = this.peticionPublicacion;
@@ -458,6 +463,7 @@ export default {
 		},
 		editarPeticionPublicacion(peticionPublicacion) {
 			this.peticionPublicacion = {...peticionPublicacion};
+			this.peticionPublicacionDraft = {...peticionPublicacion};
 			this.peticionPublicacionDialog = true;
 		},
 		confirmarBorrarPeticionPublicacion(peticionPublicacion) {
