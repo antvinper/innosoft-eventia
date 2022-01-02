@@ -59,13 +59,13 @@
 					</Column>
 					<Column field="inicio" header="Inicio" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Inicio</span>
 							{{new Date(slotProps.data.inicio).toLocaleString()}}
 						</template>
 					</Column>
 					<Column field="fin" header="Fin" :sortable="true">
 						<template #body="slotProps">
-							<span class="p-column-title">Descripción</span>
+							<span class="p-column-title">Fin</span>
 							{{new Date(slotProps.data.fin).toLocaleString()}}
 						</template>
 					</Column>
@@ -77,13 +77,41 @@
 					</Column>
 					<Column field="actions" header="Acciones">
 						<template #body="slotProps">
+							<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
+							<Button icon="pi pi-trash" class="p-button-rounded p-button-warning mr-2" @click="confirmBorrarProduct(slotProps.data)" />
+							
+							<!-- Twitter -->
+							<Button icon="pi pi-twitter" class="p-button-rounded mr-2" @click="openDisplayTwitter" />
+							<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" :style="{width: '350px'}" :modal="true">
+								<Panel header="Título" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
+								</Panel>
+								<Panel header="Fecha inicio" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
+								</Panel>
+								<Panel header="Fecha fin" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
+								</Panel>
+								<Panel header="Descripción" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.descripcion}}</p>
+								</Panel>
+								<Panel header="Imagen" :toggleable="true">
+									<img v-if="slotProps.data.imagen" :src="slotProps.data.imagen" class="shadow-2" width="100" />
+									<p v-else class="line-height-3 m-0">Sin imagen</p>
+								</Panel>
+								<template #footer>
+									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTwitter" class="p-button-text" autofocus/>
+									<Button label="Publicar" icon="pi pi-check" @click="publicarEnTwitter(slotProps.data)" class="p-button-text" />
+								</template>
+							</Dialog>
+
 							<div style="display: flex">
 								<Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-twitter" class="p-button-rounded p-button-warning mr-2" @click="openDisplayTwitter(slotProps.data)" />
 							</div>
 							<div>
-								<Button icon="pi pi-facebook" class="p-button-rounded p-button-warning mr-2" @click="publicarEnFacebook()" />
+								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded mr-2 publicado p-disabled' : 'p-button-rounded mr-2'" @click="confirmarPublicacionFacebook(slotProps.data)"/>
 								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="publicarEnTelegram()" />
 								<Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail()" />
 							</div>
@@ -148,6 +176,23 @@
 					</template>
 				</Dialog>
 
+				<Dialog v-model:visible="confirmarPublicacionFB" :style="{width: '450px'}" header="Detalles de la publicación" :modal="true" class="p-fluid">
+					<div class="field">
+						<label for="fbText">La publicación será la siguiente:</label>
+						<Textarea id="fbText" v-model="fbText" required="true" autofocus :class="{'p-invalid': submitted && !fbText}" rows="10"/>
+						<small class="p-invalid" v-if="submitted && !fbText">Este campo es obligatorio.</small>
+					</div>
+					<div class="field">
+						<label for="imagen">Imagen</label>
+						<InputText id="imagen" v-model="imagenFB" required="false" rows="3" cols="20" />
+					</div>
+					
+					<template #footer>
+						<Button label="No" icon="pi pi-times" class="p-button-text" @click="confirmarPublicacionFB = false"/>
+						<Button label="Publicar" icon="pi pi-check" class="p-button-text" @click="publicarEnFacebook" />
+					</template>
+				</Dialog>
+        
 				<Dialog header="Publicar en Twitter" v-model:visible="displayTwitter" class="col-3" :modal="true">
 					<div class="p-fluid formgrid grid" style="text-align: center; justify-content: center">
 						<Panel header="Título" class="mb-3 col-12 md:col-12">
@@ -180,6 +225,8 @@
 
 <script>
 import {FilterMatchMode} from 'primevue/api';
+import facebookAPI from '../service/FacebookApi';
+import axios from 'axios';
 
 export default {
 	data() {
@@ -197,6 +244,10 @@ export default {
 			selectedPeticionesPublicacion: null,
 			filters: {},
 			submitted: false,
+			confirmarPublicacionFB: false,
+			responseFB: null,
+			fbText: null,
+			imagenFB: null,
 			overlayMenuItems: [
 					{
 						label: 'Publicar en Twitter',
@@ -407,6 +458,49 @@ export default {
                 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
             }
         },
+		toggleMenu(event) {
+			this.$refs.menu.toggle(event);
+		},
+		confirmarPublicacionFacebook(product){
+			this.product = product
+			this.imagenFB = product.imagenFB;
+			var fechaInicio = new Date(product.inicio).toLocaleDateString();
+			var horaInicio = new Date(product.inicio).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+			this.fbText = "El evento " + product.titulo + ", se celebrará el " + fechaInicio + " a las " + horaInicio + ".\n" + product.descripcion + ".";
+			this.confirmarPublicacionFB = true;
+		},
+		publicarEnFacebook(){
+			var request = this.fbText;
+			console.log("imagen:", this.imagenFB);
+			var imagen = this.imagenFB;
+			
+			if(imagen){
+				this.responseFB = facebookAPI.fbPostPhotoOnPage(request, imagen);
+				this.establecerPublicado(this.product);
+			}else{
+				this.responseFB = facebookAPI.fbPostOnPage(request);	
+				this.establecerPublicado(this.product);
+			}
+			
+		},
+		establecerPublicado(request){
+			if(this.responseFB == '200' || this.responseFB){
+				const paramsData = {};
+				paramsData['publicadoFacebook'] = true;
+				axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+					.then(response => {
+						console.log(response.data);
+						console.log("request: ", request);
+						this.peticionesPublicacion.find(p => p._id === request._id).publicadoFacebook = true;
+					}).catch(error =>{
+						console.log(error);
+					});
+				this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento publicado en Facebook', life: 3000});
+				this.confirmarPublicacionFB = false;
+			}else{
+				this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Facebook', life: 3000});
+			}
+		}
 	}
 }
 </script>
@@ -435,8 +529,11 @@ export default {
 		background: #FFCDD2;
 		color: #C63737;
 	}
+	.publicado{
+		background-color: #22C55E;
+		border-color: #22C55E;
+	}
 }
-
 .p-panel .p-panel-header {
 	place-content: center;
 }

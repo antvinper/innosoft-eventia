@@ -9,6 +9,7 @@ const peticionPublicacionSchema = mongoose.Schema({
     inicio: Date,
     fin: Date,
     imagen: String,
+    publicadoFacebook: Boolean
 });
 
 const PeticionPublicacion = mongoose.model('PeticionPublicacion', peticionPublicacionSchema);
