@@ -104,8 +104,28 @@
 								</template>
 							</Dialog>
 
+							<!-- Telegram -->
+							<Button icon="pi pi-telegram" class="p-button-rounded mr-2" @click="openDisplayTelegram" />
+							<Dialog header="Anunciar en Telegram" v-model:visible="displayTelegram" :style="{width: '350px'}" :modal="true">
+								<Panel header="ID del evento" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.idEvento}}</p>
+								</Panel>
+								<Panel header="Título" :toggleable="true">
+									<p class="line-height-3 m-0">{{slotProps.data.titulo}}</p>
+								</Panel>
+								<Panel header="Fecha inicio" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.inicio).toLocaleString()}}</p>
+								</Panel>
+								<Panel header="Fecha fin" :toggleable="true">
+									<p class="line-height-3 m-0">{{new Date(slotProps.data.fin).toLocaleString()}}</p>
+								</Panel>
+								<template #footer>
+									<Button label="Cancelar" icon="pi pi-times" @click="closeDisplayTelegram" class="p-button-text" autofocus/>
+									<Button label="Anunciar" icon="pi pi-check" @click="publicarEnTelegram(slotProps.data)" class="p-button-text" />
+								</template>
+							</Dialog>
+
 							<Button icon="pi pi-facebook" class="p-button-rounded mr-2" @click="publicarEnFacebook()" />
-							<Button icon="pi pi-telegram" class="p-button-rounded mr-2 mt-2" @click="publicarEnTelegram()" />
 							<Button icon="pi pi-at" class="p-button-rounded mt-2" @click="publicarEnGmail()" />
 						</template>
 					</Column>
@@ -212,6 +232,7 @@ export default {
 	data() {
 		return {
 			displayTwitter: false,
+			displayTelegram: false,
 			peticionesPublicacion: null,
 			peticionesPublicacionDialog: false,
 			borrarProductDialog: false,
@@ -300,6 +321,26 @@ export default {
 				})
 			}
 			this.closeDisplayTwitter();
+		},
+		openDisplayTelegram() {
+			this.displayTelegram = true;
+		},
+		closeDisplayTelegram() {
+			this.displayTelegram = false;
+		},
+		publicarEnTelegram(request){
+			let cuerpoDelMensaje = request.idEvento + " " + (new Date(request.inicio).toLocaleString()) + " " + (new Date(request.fin).toLocaleString()) + " " + request.titulo;
+			let command = {};
+			command["command"] = `node ./src/service/TelegramChannelBotService.js ${cuerpoDelMensaje}`;
+			this.axios.post('/telegram', command)
+			.then((response) => {
+				console.log(response.data);
+				this.$toast.add({severity:'success', summary: 'Successful', detail: 'Evento anunciado con éxito en Telegram', life: 3000});
+			})
+			.catch((e)=>{
+				console.log('error' + e);
+			})
+			this.closeDisplayTelegram();
 		},
 		formatCurrency(value) {
 			if(value)
