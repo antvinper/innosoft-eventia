@@ -219,8 +219,6 @@
 	</div>
 </template>
 <script>
-	import CountryService from '../service/CountryService';
-	import NodeService from '../service/NodeService';
 	export default {
 		data() {
 			return {
@@ -284,16 +282,6 @@
 				treeSelectNodes: null,
 				selectedNode: null,
 			}
-		},
-		countryService: null,
-		nodeService: null,
-		created() {
-			this.countryService = new CountryService();
-			this.nodeService = new NodeService();
-		},
-		mounted() {
-			this.countryService.getCountries().then(data => this.autoValue = data);
-			this.nodeService.getTreeNodes().then(data => this.treeSelectNodes = data);
 		},
 		methods: {
 			searchCountry(event) {

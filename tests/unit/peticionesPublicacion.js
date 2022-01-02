@@ -17,7 +17,6 @@ describe('Crear peticion de publicacion: ', () => {
         descripcion: "Aula A0.13 Speaker: Test",
         inicio: new Date("2021-11-24T21:15:13"),
         fin: Date.now(),
-        estado: "Pendiente"
       })
       .end(function(err,res) {
         console.log(res.body)
@@ -50,7 +49,6 @@ describe('Actualizar peticion de publicacion: ', () => {
       descripcion: "Aula A0.13 Speaker: Test actualizado",
       inicio: new Date("2021-11-24T21:15:14"),
       fin: Date.now(),
-      estado: "Publicado"
     })
     .end(function(err,res) {
       console.log(res.body)
