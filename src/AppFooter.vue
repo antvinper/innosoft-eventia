@@ -1,27 +1,27 @@
 <template>
 	<div class="layout-footer">
-		<img alt="Logo" :src="footerImage()" height="20" class="mr-2" />
-		by
-		<span class="font-medium ml-2">PrimeVue</span>
+		<img alt="Logo" :src="LogoInnosoft" height="75" class="mr-2" />
+		Herramienta para la gestión de las jornadas
+		<span class="font-medium ml-2">InnosoftDevDays</span>
 	</div>
 </template>
 
 <script>
-	export default {
-		name: "AppFooter",
-		methods: {
-			footerImage() {
-				return this.$appState.darkTheme ? 'images/logo-white.svg' : 'images/logo-dark.svg';
-			}
-		},
-		computed: {
-			darkTheme() {
-				return this.$appState.darkTheme;
-			}
+import LogoInnosoft from "@/assets/LogoInnosoft.png"
+
+export default {
+	name: "AppFooter",
+	data() {
+		return {
+			LogoInnosoft: LogoInnosoft,
 		}
 	}
+}
+
 </script>
 
 <style scoped>
-
+	.layout-footer {
+		font-size: 16px;
+	}
 </style>

@@ -33,15 +33,15 @@ const _id = req.params.id;
 router.post('/', async(req, res) => {
     const body = req.body;  
     try {
-    console.log("Creando una nueva peticionPublicacion")
-    body._id = new mongoose.Types.ObjectId()
-    const peticionPublicacionDB = await PeticionPublicacion.create(body);
-    res.status(200).json(peticionPublicacionDB); 
+        console.log("Creando una nueva peticion de publicacion")
+        body._id = new mongoose.Types.ObjectId()
+        const peticionPublicacionDB = await PeticionPublicacion.create(body);
+        res.status(200).json(peticionPublicacionDB); 
     } catch (error) {
-    return res.status(500).json({
-        mensaje: 'An error has occurred',
-        error
-    })
+        return res.status(500).json({
+            mensaje: 'An error has occurred',
+            error
+        })
     }
 });
 
@@ -49,7 +49,7 @@ router.put('/:id', async(req, res) => {
     const _id = req.params.id;
     const body = req.body;  
     try {
-        console.log("Actualizando una peticionPublicacion")
+        console.log("Actualizando una peticion de publicacion")
 
         const peticionPublicacionDB = await PeticionPublicacion.findByIdAndUpdate(_id, body);
 

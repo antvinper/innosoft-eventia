@@ -1,10 +1,5 @@
 const mongoose = require('mongoose');
 
-let estadosValidos = {
-    values: [null, "Pendiente", "Aceptado", "Rechazado"],
-    message: '{VALUE} no es un estado valido'
-}
-
 const peticionPublicacionSchema = mongoose.Schema({
 
     _id: mongoose.Schema.Types.ObjectId,
@@ -14,11 +9,8 @@ const peticionPublicacionSchema = mongoose.Schema({
     inicio: Date,
     fin: Date,
     imagen: String,
-    estado: {
-        type: String,
-        default: null,
-        enum: estadosValidos,
-    },
+    botonGmail:Boolean,
+    publicadoFacebook: Boolean
 });
 
 const PeticionPublicacion = mongoose.model('PeticionPublicacion', peticionPublicacionSchema);
