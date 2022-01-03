@@ -96,6 +96,7 @@ import CodeHighlight from './AppCodeHighlight';
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import store from './store'
 
 
 router.beforeEach(function(to, from, next) {
@@ -103,7 +104,12 @@ router.beforeEach(function(to, from, next) {
     next();
 });
 
-axios.defaults.baseURL = 'http://localhost:3000/api/v1/';
+axios.defaults.baseURL = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000/api/v1/';
+
+axios.defaults.auth = {
+    username: store.state.username,
+    password: store.state.password
+};
 
 const app = createApp(App);
 
@@ -114,6 +120,7 @@ app.use(VueAxios, axios)
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(router);
+app.use(store);
 
 app.directive('tooltip', Tooltip);
 app.directive('ripple', Ripple);

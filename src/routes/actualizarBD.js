@@ -15,6 +15,7 @@ router.put('/', async(req, res) => {
 
         axios.get("https://www.eventbriteapi.com/v3/organizations/" + ID_ORGANIZACION + "/events?token=" + TOKEN_APLICACION)
         .then((response) => {
+            console.log("Response: ", response.data)
             const eventos = response.data.events;
             let peticionesPublicacionNuevas = eventos.filter(e => !(peticionesPublicacionExistentes.map(p => p.idEvento)).includes(e.id))
             console.log("Peticiones publicacion nuevas: ", peticionesPublicacionNuevas[0])
@@ -27,7 +28,7 @@ router.put('/', async(req, res) => {
                     descripcion: evento.description.text,
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
-                    imagen: evento.logo? evento.logo.original.url: '',
+                    imagen: evento.logo ? evento.logo.original.url : '',
                     botonGmail: false,
                     publicadoFacebook: false,
                     publicadoTwitter: false,
