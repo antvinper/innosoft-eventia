@@ -227,7 +227,6 @@
 <script>
 import {FilterMatchMode} from 'primevue/api';
 import facebookAPI from '../service/FacebookApi';
-import axios from 'axios';
 import { obtenerAuthURL } from "../service/gmailService.js";
 import { enviarEmail } from "../service/gmailService.js";
 import { obtenerToken } from "../service/gmailService.js";
@@ -546,23 +545,23 @@ export default {
 			this.fbText = "El evento " + peticionPublicacion.titulo + ", se celebrará el " + fechaInicio + " a las " + horaInicio + (peticionPublicacion.descripcion ?  ".\n" + peticionPublicacion.descripcion + "." : ".");
 			this.confirmarPublicacionFB = true;
 		},
-		publicarEnFacebook(){
+		async publicarEnFacebook(){
 			var request = this.fbText;
 			var imagen = this.peticionParaPublicarConFacebook.imagen;
 			
 			if(imagen){
-				this.responseFB = facebookAPI.fbPostPhotoOnPage(request, imagen);
+				this.responseFB = await facebookAPI.fbPostPhotoOnPage(request, imagen);
 				this.establecerPublicado(this.peticionParaPublicarConFacebook);
 			}else{
-				this.responseFB = facebookAPI.fbPostOnPage(request);	
+				this.responseFB = await facebookAPI.fbPostOnPage(request);	
 				this.establecerPublicado(this.peticionParaPublicarConFacebook);
 			}
 		},
-		establecerPublicado(request){
-			if(this.responseFB == '200' || this.responseFB) {
+		async establecerPublicado(request){
+			if(this.responseFB == '200') {
 				const paramsData = {};
 				paramsData['publicadoFacebook'] = true;
-				axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+				await this.axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
 					.then(() => {
 						this.peticionesPublicacion.find(p => p._id === request._id).publicadoFacebook = true;
 						this.peticionParaPublicarConFacebook = {}
@@ -572,7 +571,7 @@ export default {
 				this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado en Facebook', life: 3000});
 				this.confirmarPublicacionFB = false;
 			} else {
-				this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Facebook', life: 3000});
+				this.$toast.add({severity:'error', summary: 'Error', detail: `No se pudo publicar el evento en Facebook: ${this.responseFB}.`, life: 3000});
 			}
 		},
 		cancelarPublicarFacebook() {
