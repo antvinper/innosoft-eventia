@@ -11,8 +11,7 @@
 		"build": "vue-cli-service build",
 		"lint": "vue-cli-service lint",
 		"test:unit": "vue-cli-service test:unit",
-		"ci": "start-test \"npm run serve\" 8080 ci-2",
-		"ci-2": "start-test \"node index.js\" http://localhost:3000/api/v1/peticionesPublicacion test",
+		"ci": "start-test \"npm run serve\" 8080 test",
 		"test": "mocha tests/unit/*.js --timeout 15000",
 		"cypress:open": "cypress open"
 	},
