@@ -84,11 +84,12 @@
 								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-twitter" :class="slotProps.data.publicadoTwitter ? 'p-button-rounded p-button-success mr-2 p-disabled' 
 								: 'p-button-rounded p-button-warning mr-2'" @click="openDisplayTwitter(slotProps.data)" />
+								<Button icon="pi pi-telegram" :class="slotProps.data.publicadoTelegram ? 'p-button-rounded p-button-success mr-2' 
+								: 'p-button-rounded p-button-warning mr-2'" @click="openDisplayTelegram(slotProps.data)" />
 							</div>
 							<div>
 								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded p-button-success mr-2 p-disabled' 
 								: 'p-button-rounded p-button-warning mr-2'" @click="confirmarPublicacionFacebook(slotProps.data)"/>
-								<Button icon="pi pi-telegram" class="p-button-rounded p-button-warning mr-2 mt-2" @click="openDisplayTelegram(slotProps.data)" />
                                 <Button icon="pi pi-at" class="p-button-rounded p-button-warning mt-2" @click="publicarEnGmail(slotProps.data)" />
 							</div>
 						</template>
@@ -428,6 +429,15 @@ export default {
 			.then((response) => {
 				console.log(response.data);
 				this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento anunciado con éxito en Telegram', life: 3000});
+				const paramsData = {};
+				paramsData['publicadoTelegram'] = true;
+				axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+					.then(() => {
+						this.peticionesPublicacion.find(p => p._id === request._id).publicadoTelegram = true;
+						this.peticionParaPublicarConFacebook = {}
+					}).catch(error =>{
+						console.log(error);
+					});
 			})
 			.catch((e)=>{
 				console.log('error' + e);
@@ -468,11 +478,11 @@ export default {
 					if (original.titulo !== this.peticionPublicacion.titulo || original.descripcion !== this.peticionPublicacion.descripcion || original.inicio !== this.peticionPublicacion.inicio || original.fin !== this.peticionPublicacion.fin){
 						this.peticionPublicacion.publicadoFacebook = false;
 						this.peticionPublicacion.publicadoTwitter = false;
+						this.peticionPublicacion.publicadoTelegram = false;
 						
 						this.axios.put('/peticionesPublicacion/' + this.peticionPublicacion._id, this.peticionPublicacion)
 						.then(() => {
 							this.peticionesPublicacion[this.findIndexById(this.peticionPublicacion._id)] = this.peticionPublicacion;
-
 							this.axios.get('/peticionesPublicacion')
 							.then((response) => {
 								this.peticionesPublicacion = response.data;
@@ -480,7 +490,6 @@ export default {
 							.catch((e)=>{
 								console.log('error' + e);
 							})
-
 							this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticion de publicacion actualizada', life: 3000});
 						})
 						.catch((e)=>{

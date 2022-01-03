@@ -11,7 +11,8 @@ const peticionPublicacionSchema = mongoose.Schema({
     imagen: String,
     botonGmail:Boolean,
     publicadoFacebook: Boolean,
-    publicadoTwitter: Boolean
+    publicadoTwitter: Boolean,
+    publicadoTelegram: Boolean
 });
 
 const PeticionPublicacion = mongoose.model('PeticionPublicacion', peticionPublicacionSchema);
