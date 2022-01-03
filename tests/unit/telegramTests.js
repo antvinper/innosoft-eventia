@@ -11,7 +11,7 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN
 const TELEGRAM_USERBOT = process.env.TELEGRAM_USERBOT
 
 chai.use(chaiHttp);
-const url = 'http://localhost:3000/api/v1';
+const url = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000/api/v1';
 
 describe('Despliegue de bot de usuario: ', () => {
     it('despliega el bot de usuario de Telegram', () => {

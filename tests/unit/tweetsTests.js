@@ -13,7 +13,7 @@ var T = new Twit({
 });
 
 chai.use(chaiHttp);
-const url = 'http://localhost:3000/api/v1';
+const url = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000/api/v1';
 
 var idTweet1;
 var idTweet2;
@@ -22,6 +22,7 @@ describe('Publicar tweet SIN imagen: ', () => {
     it('deberia publicar un tweet SIN imagen', (done) => {
     chai.request(url)
       .post('/tweet')
+      .auth(process.env.LOGIN_USERNAME, process.env.LOGIN_PASSWORD)
       .send({
         command: "node ./src/twitter-api/publicarTweetSinImagen.js Test 1 Automatizado 01/01/2023 0:00:00"
       })
@@ -39,6 +40,7 @@ describe('Publicar tweet CON imagen: ', () => {
     it('deberia publicar un tweet CON imagen', (done) => {
     chai.request(url)
       .post('/tweet')
+      .auth(process.env.LOGIN_USERNAME, process.env.LOGIN_PASSWORD)
       .send({
         command: "node ./src/twitter-api/publicarTweetConImagen.js Test 2 Automatizado 01/01/2023 0:00:00 https://institucional.us.es/innosoft/wp-content/uploads/2018/10/logo_2_negro-e1540204473260.png"
       })
