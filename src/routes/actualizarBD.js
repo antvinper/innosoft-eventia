@@ -29,7 +29,9 @@ router.put('/', async(req, res) => {
                     fin: new Date(evento.end.local),
                     imagen: evento.logo.original.url,
                     botonGmail: false,
-                    publicadoFacebook: false
+                    publicadoFacebook: false,
+                    publicadoTwitter: false,
+                    publicadoTelegram: false
                 }
                 añadirBD.push(peticionPublicacion)
             }
