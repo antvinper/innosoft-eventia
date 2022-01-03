@@ -15,8 +15,7 @@ module.exports = (ctx) => {
                 const date1 = new Date(response.data[element].inicio)
                 if (Date.now() <= date1){
                     events = response.data[element].titulo + ", " + moment(response.data[element].inicio).locale("es").format('LLL') + " - "+ 
-                    moment(response.data[element].fin).locale("es").format('LLL') + ", " + response.data[element].descripcion + "."
-                    + "\n"
+                    moment(response.data[element].fin).locale("es").format('LLL') + ", " + response.data[element].descripcion + "\n"
 
                     var options = {
                         reply_markup: JSON.stringify({

@@ -27,7 +27,7 @@ router.put('/', async(req, res) => {
                     descripcion: evento.description.text,
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
-                    imagen: evento.logo.original.url,
+                    imagen: evento.logo? evento.logo.original.url: '',
                     botonGmail: false,
                     publicadoFacebook: false,
                     publicadoTwitter: false,
