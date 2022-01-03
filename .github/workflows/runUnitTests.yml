@@ -26,6 +26,10 @@ jobs:
         VUE_APP_FB_API_PAGE_TOKEN: ${{ secrets.VUE_APP_FB_API_PAGE_TOKEN }}
         VUE_APP_FB_GRAPH_VERSION: ${{ secrets.VUE_APP_FB_GRAPH_VERSION }}
         VUE_APP_FB_PAGE_ID: ${{ secrets.VUE_APP_FB_PAGE_ID }}
+        VUE_APP_FRONTEND_URL: ${{ secrets.VUE_APP_FRONTEND_URL }}
+        VUE_APP_BACKEND_URL: ${{ secrets.VUE_APP_BACKEND_URL }}
+        LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
+        LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
       run: |
           touch .env
           echo MONGO_URL="$MONGO_URL" >> .env
@@ -41,6 +45,10 @@ jobs:
           echo VUE_APP_FB_API_PAGE_TOKEN="$VUE_APP_FB_API_PAGE_TOKEN" >> .env
           echo VUE_APP_FB_GRAPH_VERSION="$VUE_APP_FB_GRAPH_VERSION" >> .env
           echo VUE_APP_FB_PAGE_ID="$VUE_APP_FB_PAGE_ID" >> .env
+          echo VUE_APP_FRONTEND_URL="$VUE_APP_FRONTEND_URL" >> .env
+          echo VUE_APP_BACKEND_URL="$VUE_APP_BACKEND_URL" >> .env
+          echo LOGIN_USERNAME="$LOGIN_USERNAME" >> .env
+          echo LOGIN_PASSWORD="$LOGIN_PASSWORD" >> .env
           npm ci
           npm run ci
       shell: bash

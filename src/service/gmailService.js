@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const client_id = process.env.VUE_APP_CLIENTID;
 const client_secret = process.env.VUE_APP_CLIENTSECRET;
-const uri = process.env.VUE_APP_URI;
+const uri = process.env.VUE_APP_FRONTEND_URL;
 
 const SCOPES=[
     'https://mail.google.com/',
