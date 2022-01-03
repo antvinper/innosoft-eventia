@@ -3,13 +3,15 @@ const moment = require('moment');
 const dotenv = require("dotenv");
 dotenv.config({ path: require('find-config')('.env') });
 
+let backendUrl = process.env.BACKEND_URL || "http://localhost:3000/api/v1"
+
 module.exports = (ctx) => {
-    let backendUrl = process.env.BACKEND_URL || "http://localhost:3000/api/v1"
+
     axios.get(backendUrl + "/peticionesPublicacion")
         .then(response => {
             let events = ""
             const lenEvents = events.length
-            for(const element in response.data){
+            for(const element in response.data) {
                 const date1 = new Date(response.data[element].inicio)
                 if (Date.now() <= date1){
                     events = response.data[element].titulo + ", " + moment(response.data[element].inicio).locale("es").format('LLL') + " - "+ 

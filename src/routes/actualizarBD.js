@@ -16,7 +16,6 @@ router.put('/', async(req, res) => {
         axios.get("https://www.eventbriteapi.com/v3/organizations/" + ID_ORGANIZACION + "/events?token=" + TOKEN_APLICACION)
         .then((response) => {
             const eventos = response.data.events;
-            console.log("Peticiones publicacion existentes: ", peticionesPublicacionExistentes[0])
             let peticionesPublicacionNuevas = eventos.filter(e => !(peticionesPublicacionExistentes.map(p => p.idEvento)).includes(e.id))
             console.log("Peticiones publicacion nuevas: ", peticionesPublicacionNuevas[0])
             let añadirBD = []
@@ -28,6 +27,7 @@ router.put('/', async(req, res) => {
                     descripcion: evento.description.text,
                     inicio: new Date(evento.start.local),
                     fin: new Date(evento.end.local),
+                    imagen: evento.logo.original.url,
                     botonGmail: false,
                     publicadoFacebook: false
                 }
@@ -40,8 +40,6 @@ router.put('/', async(req, res) => {
         .catch((e)=>{
             console.log('error' + e);
         })
-        // const peticionPublicacionDB = await PeticionPublicacion.find();
-        // res.json(peticionPublicacionDB);
     } catch (error) {
         return res.status(400).json({
             mensaje: 'An error has occurred',
