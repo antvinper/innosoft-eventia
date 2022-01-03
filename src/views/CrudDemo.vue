@@ -82,7 +82,8 @@
 							<div style="display: flex">
 								<Button icon="pi pi-pencil" class="p-button-rounded p-button-primary mr-2" @click="editarPeticionPublicacion(slotProps.data)" />
 								<Button icon="pi pi-trash" class="p-button-rounded p-button-danger mr-2" @click="confirmarBorrarPeticionPublicacion(slotProps.data)" />
-								<Button icon="pi pi-twitter" class="p-button-rounded p-button-warning mr-2" @click="openDisplayTwitter(slotProps.data)" />
+								<Button icon="pi pi-twitter" :class="slotProps.data.publicadoTwitter ? 'p-button-rounded p-button-success mr-2 p-disabled' 
+								: 'p-button-rounded p-button-warning mr-2'" @click="openDisplayTwitter(slotProps.data)" />
 							</div>
 							<div>
 								<Button icon="pi pi-facebook" :class="slotProps.data.publicadoFacebook ? 'p-button-rounded p-button-success mr-2 p-disabled' 
@@ -353,17 +354,32 @@ export default {
 		},
 		publicarEnTwitter(request){
 			if(request.imagen){
-				let cuerpoDelTweet = request.titulo + " " + (new Date(request.inicio).toLocaleString()) + " " + request.imagen;
+				let uriFoto = request.imagen.replaceAll("&","^&")
+				let cuerpoDelTweet = request.titulo + " " + (new Date(request.inicio).toLocaleString()) + " " + uriFoto;
 				console.log("Tweet con foto");
 				let command = {};
 				command["command"] = `node ./src/twitter-api/publicarTweetConImagen.js ${cuerpoDelTweet}`;
 				this.axios.post('/tweet', command)
 				.then((response) => {
-					console.log(response.data);
-					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					if(response.data.result.replace(/(\r\n|\n|\r)/gm,"") !== "undefined"){
+						console.log(response.data);
+						this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					}else{
+						this.$toast.add({severity:'error', summary: 'Error', detail: 'Este evento ya ha sido publicado en Twitter', life: 3000});
+					}
+					const paramsData = {};
+					paramsData['publicadoTwitter'] = true;
+					axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+						.then(() => {
+							this.peticionesPublicacion.find(p => p._id === request._id).publicadoTwitter = true;
+							this.peticionParaPublicarConFacebook = {}
+						}).catch(error =>{
+							console.log(error);
+						});
 				})
 				.catch((e)=>{
 					console.log('error' + e);
+					this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Twitter', life: 3000});
 				})
 			}
 			else{
@@ -373,11 +389,25 @@ export default {
 				command["command"] = `node ./src/twitter-api/publicarTweetSinImagen.js ${cuerpoDelTweet}`;
 				this.axios.post('/tweet', command)
 				.then((response) => {
-					console.log(response.data);
-					this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					if(response.data.result.replace(/(\r\n|\n|\r)/gm,"") !== "undefined"){
+						console.log(response.data);
+						this.$toast.add({severity:'success', summary: 'Exito', detail: 'Evento publicado con éxito en Twitter', life: 3000});
+					}else{
+						this.$toast.add({severity:'error', summary: 'Error', detail: 'Este evento ya ha sido publicado en Twitter', life: 3000});
+					}
+					const paramsData = {};
+					paramsData['publicadoTwitter'] = true;
+					axios.put(`/peticionesPublicacion/${request._id}`, paramsData)
+						.then(() => {
+							this.peticionesPublicacion.find(p => p._id === request._id).publicadoTwitter = true;
+							this.peticionParaPublicarConFacebook = {}
+						}).catch(error =>{
+							console.log(error);
+						});
 				})
 				.catch((e)=>{
 					console.log('error' + e);
+					this.$toast.add({severity:'error', summary: 'Error', detail: 'No se pudo publicar el evento en Twitter', life: 3000});
 				})
 			}
 			this.closeDisplayTwitter();
@@ -436,25 +466,27 @@ export default {
 				if (this.peticionPublicacion._id) {
 					let original = this.peticionesPublicacion.find(p => p._id === this.peticionPublicacionDraft._id)
 					if (original.titulo !== this.peticionPublicacion.titulo || original.descripcion !== this.peticionPublicacion.descripcion || original.inicio !== this.peticionPublicacion.inicio || original.fin !== this.peticionPublicacion.fin){
-						this.peticionPublicacion.publicadoFacebook = false
-					}
-					this.axios.put('/peticionesPublicacion/' + this.peticionPublicacion._id, this.peticionPublicacion)
-					.then(() => {
-						this.peticionesPublicacion[this.findIndexById(this.peticionPublicacion._id)] = this.peticionPublicacion;
+						this.peticionPublicacion.publicadoFacebook = false;
+						this.peticionPublicacion.publicadoTwitter = false;
+						
+						this.axios.put('/peticionesPublicacion/' + this.peticionPublicacion._id, this.peticionPublicacion)
+						.then(() => {
+							this.peticionesPublicacion[this.findIndexById(this.peticionPublicacion._id)] = this.peticionPublicacion;
 
-						this.axios.get('/peticionesPublicacion')
-						.then((response) => {
-							this.peticionesPublicacion = response.data;
+							this.axios.get('/peticionesPublicacion')
+							.then((response) => {
+								this.peticionesPublicacion = response.data;
+							})
+							.catch((e)=>{
+								console.log('error' + e);
+							})
+
+							this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticion de publicacion actualizada', life: 3000});
 						})
 						.catch((e)=>{
 							console.log('error' + e);
 						})
-
-						this.$toast.add({severity:'success', summary: 'Exito', detail: 'Peticion de publicacion actualizada', life: 3000});
-					})
-					.catch((e)=>{
-						console.log('error' + e);
-					})
+					}
 				}
 				this.peticionPublicacionDialog = false;
 				this.peticionPublicacion = {};
