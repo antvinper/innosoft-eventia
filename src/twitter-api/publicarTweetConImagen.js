@@ -26,8 +26,8 @@ if(process.argv.length >= 5){
   var texto = "El evento " + titulo + "se realizará el día " + process.argv[l-3] + " a las " + process.argv[l-2] + " horas. ¡Os esperamos!";
   var rutaImagen = process.argv[l-1];
 
-  download(rutaImagen, 'src/assets/imagenTwitter.jpg', function(){
-    var b64content = fs.readFileSync('src/assets/imagenTwitter.jpg', { encoding: 'base64' });
+  download(rutaImagen, 'imagenTwitter.jpg', function(){
+    var b64content = fs.readFileSync('imagenTwitter.jpg', { encoding: 'base64' });
 
       T.post('media/upload', { media_data: b64content }, function (err, data, response) {
         var mediaIdStr = data.media_id_string
